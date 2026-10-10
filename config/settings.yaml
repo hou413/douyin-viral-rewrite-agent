@@ -1,0 +1,99 @@
+# 抖音爆款改写Agent 配置文件
+
+# 采集配置
+collector:
+  # 采集方式: api / scraper / control_screen
+  method: "scraper"
+  # 抖音Cookie（scraper模式需要）
+  douyin_cookie: ""
+  # API配置（api模式需要）
+  api_key: ""
+  api_secret: ""
+  # 每次采集最大视频数
+  max_videos_per_run: 50
+  # 请求间隔（秒）
+  request_interval: 2
+
+# 筛选配置
+filter:
+  # 时间范围（天）
+  time_range_days: 7
+  # 最低播放量
+  min_play_count: 100000
+  # 最低点赞数
+  min_like_count: 10000
+  # 最低评论数
+  min_comment_count: 500
+  # 去重相似度阈值（0-1）
+  dedup_similarity_threshold: 0.85
+
+# 提取配置
+extractor:
+  # 是否提取字幕
+  extract_subtitles: true
+  # 是否提取评论区
+  extract_comments: true
+  # 评论取前N条
+  max_comments: 50
+
+# AI配置
+ai:
+  # 模型提供商: openai / dashscope / local
+  provider: "dashscope"
+  # 模型名称
+  model: "qwen-plus"
+  # API Key
+  api_key: ""
+  # API Base URL
+  base_url: ""
+  # 温度参数
+  temperature: 0.8
+  # 最大token
+  max_tokens: 4096
+
+# 创作配置
+creator:
+  # 每次生成文案数量
+  num_variants: 3
+  # 文案风格
+  styles:
+    - "口播"
+    - "故事"
+    - "干货"
+
+# 质量评估配置
+evaluator:
+  # 最低通过分数（0-100）
+  min_score: 70
+  # 评估维度权重
+  weights:
+    attraction: 0.35
+    relevance: 0.30
+    originality: 0.35
+
+# 输出配置
+output:
+  # 输出方式: feishu / local / both
+  mode: "both"
+  # 本地输出路径
+  local_path: "./data/output"
+  # 飞书配置
+  feishu:
+    app_id: ""
+    app_secret: ""
+    # 多维表格token
+    bitable_app_token: ""
+    # 文档文件夹token
+    folder_token: ""
+
+# 定时任务配置
+scheduler:
+  # 是否启用定时
+  enabled: false
+  # Cron表达式（每天上午10点）
+  cron: "0 10 * * *"
+
+# 日志配置
+logging:
+  level: "INFO"
+  file: "./logs/agent.log"

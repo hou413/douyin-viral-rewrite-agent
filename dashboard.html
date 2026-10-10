@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>抖音爆款改写Agent</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --bg: #fafafa;
+      --card: #ffffff;
+      --text: #1a1a1a;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 32px;
+    }
+
+    @media (max-width: 900px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background: var(--card);
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+
+    .result-area {
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .result-placeholder {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 40px;
+    }
+
+    .result-placeholder svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+
+    .progress-steps {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .progress-steps.active {
+      display: flex;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--bg);
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .step-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    .step.pending .step-icon {
+      background: var(--border);
+      color: var(--text-muted);
+    }
+
+    .step.running .step-icon {
+      background: var(--warning);
+      color: white;
+      animation: pulse 1.5s infinite;
+    }
+
+    .step.done .step-icon {
+      background: var(--success);
+      color: white;
+    }
+
+    .step.error .step-icon {
+      background: var(--error);
+      color: white;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .result-content {
+      display: none;
+    }
+
+    .result-content.active {
+      display: block;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--bg);
+      padding: 16px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .script-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .script-item {
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .script-header {
+      display: flex;
+      justify-content: between;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 12px;
+    }
+
+    .script-title {
+      font-weight: 600;
+      font-size: 15px;
+      flex: 1;
+    }
+
+    .script-score {
+      background: var(--primary);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .script-meta {
+      display: flex;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .script-text {
+      font-size: 14px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      color: var(--text);
+      background: var(--card);
+      padding: 12px;
+      border-radius: 6px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .script-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    .tag {
+      background: var(--card);
+      color: var(--primary);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab {
+      padding: 10px 16px;
+      font-size: 14px;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: all 0.2s;
+    }
+
+    .tab:hover {
+      color: var(--text);
+    }
+
+    .tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .analysis-section {
+      margin-bottom: 24px;
+    }
+
+    .analysis-section h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+
+    .analysis-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .analysis-item {
+      background: var(--bg);
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    .loading-dots {
+      display: inline-flex;
+      gap: 4px;
+    }
+
+    .loading-dots span {
+      width: 6px;
+      height: 6px;
+      background: var(--primary);
+      border-radius: 50%;
+      animation: bounce 1.4s infinite ease-in-out both;
+    }
+
+    .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎬 抖音爆款改写Agent</h1>
+      <p class="subtitle">自动采集爆款 → AI分析创作 → 质量评估输出</p>
+    </header>
+
+    <div class="main-grid">
+      <!-- 左侧：输入面板 -->
+      <div class="card">
+        <div class="card-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+          任务配置
+        </div>
+
+        <div class="form-group">
+          <label>关键词 *</label>
+          <input type="text" id="keywords" placeholder="多个关键词用逗号分隔" value="机器人,具身智能">
+        </div>
+
+        <div class="form-group">
+          <label>目标受众</label>
+          <input type="text" id="audience" placeholder="描述你的目标用户" value="科技爱好者、创业者">
+        </div>
+
+        <div class="form-group">
+          <label>产品信息</label>
+          <textarea id="product" placeholder="产品卖点、核心功能等"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>文案风格</label>
+          <select id="style">
+            <option value="口播">口播 - 直接有力</option>
+            <option value="故事">故事 - 情感共鸣</option>
+            <option value="干货">干货 - 信息密集</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary" id="runBtn" onclick="startRun()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+          开始运行
+        </button>
+      </div>
+
+      <!-- 右侧：结果面板 -->
+      <div class="card result-area">
+        <div class="card-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+          </svg>
+          执行结果
+        </div>
+
+        <!-- 占位状态 -->
+        <div class="result-placeholder" id="placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+          <p>配置左侧参数后点击运行</p>
+          <p style="font-size: 13px; margin-top: 8px;">Agent将自动采集、分析、创作文案</p>
+        </div>
+
+        <!-- 进度状态 -->
+        <div class="progress-steps" id="progressSteps">
+          <div class="step pending" data-step="1">
+            <div class="step-icon">1</div>
+            <span>爆款采集</span>
+          </div>
+          <div class="step pending" data-step="2">
+            <div class="step-icon">2</div>
+            <span>爆款筛选</span>
+          </div>
+          <div class="step pending" data-step="3">
+            <div class="step-icon">3</div>
+            <span>文案提取</span>
+          </div>
+          <div class="step pending" data-step="4">
+            <div class="step-icon">4</div>
+            <span>AI分析</span>
+          </div>
+          <div class="step pending" data-step="5">
+            <div class="step-icon">5</div>
+            <span>AI创作</span>
+          </div>
+          <div class="step pending" data-step="6">
+            <div class="step-icon">6</div>
+            <span>质量评估</span>
+          </div>
+          <div class="step pending" data-step="7">
+            <div class="step-icon">7</div>
+            <span>结果输出</span>
+          </div>
+        </div>
+
+        <!-- 结果内容 -->
+        <div class="result-content" id="resultContent">
+          <div class="tabs">
+            <div class="tab active" onclick="switchTab('overview')">概览</div>
+            <div class="tab" onclick="switchTab('scripts')">文案</div>
+            <div class="tab" onclick="switchTab('analysis')">分析</div>
+          </div>
+
+          <!-- 概览 -->
+          <div class="tab-content active" id="tab-overview">
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-value" id="stat-collected">0</div>
+                <div class="stat-label">采集视频</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" id="stat-filtered">0</div>
+                <div class="stat-label">筛选爆款</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" id="stat-created">0</div>
+                <div class="stat-label">创作文案</div>
+              </div>
+            </div>
+
+            <div class="analysis-section">
+              <h4>🔥 爆款因子</h4>
+              <div class="analysis-list" id="viralFactors"></div>
+            </div>
+
+            <div class="analysis-section">
+              <h4>🎯 用户痛点</h4>
+              <div class="analysis-list" id="painPoints"></div>
+            </div>
+          </div>
+
+          <!-- 文案 -->
+          <div class="tab-content" id="tab-scripts">
+            <div class="script-list" id="scriptList"></div>
+          </div>
+
+          <!-- 分析 -->
+          <div class="tab-content" id="tab-analysis">
+            <div class="analysis-section">
+              <h4>钩子模式</h4>
+              <div class="analysis-list" id="hookPatterns"></div>
+            </div>
+            <div class="analysis-section">
+              <h4>内容结构</h4>
+              <div class="analysis-list" id="contentStructure"></div>
+            </div>
+            <div class="analysis-section">
+              <h4>互动逻辑</h4>
+              <div class="analysis-list" id="engagementLogic"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 模拟数据（实际使用时连接后端API）
+    const mockResult = {
+      collected: 48,
+      filtered: 12,
+      created: 3,
+      viralFactors: [
+        '开头3秒制造认知冲突，引发好奇',
+        '用真实案例替代抽象概念',
+        '痛点场景化，让用户产生代入感',
+        '数据可视化增强说服力'
+      ],
+      painPoints: [
+        '不了解具身智能的实际应用场景',
+        '担心技术落地难度大、成本高',
+        '缺乏可参考的成功案例'
+      ],
+      hooks: [
+        { name: '悬念型', example: '90%的人不知道，机器人已经能...' },
+        { name: '痛点型', example: '你是不是也觉得，XXX太难了？' },
+        { name: '数据型', example: '3个月增长300%，他们做对了什么？' }
+      ],
+      structure: {
+        hook: '前3秒用反常识数据抓住注意力',
+        development: '用2-3个案例展开论证',
+        climax: '核心产品/方案自然引出',
+        ending: 'CTA引导评论+收藏'
+      },
+      engagement: {
+        like: '提供实用干货，让用户觉得有价值',
+        comment: '抛出开放性问题引发讨论',
+        save: '信息密度高，值得反复看',
+        share: '有社交货币属性，展示专业度'
+      },
+      scripts: [
+        {
+          title: '具身智能不再是概念，它已经走进家庭',
+          score: 92,
+          style: '口播',
+          duration: 45,
+          text: '【开场：展示机器人做家务的画面】\n\n你以为机器人还在实验室里？\n\n错了。\n\n【展示产品特写】\n\n这台XX机器人，已经能帮你：\n- 整理房间\n- 照看孩子\n- 陪伴老人\n\n【展示用户反馈截图】\n\n3000个家庭已经在用。\n\n评论区告诉我，你最想让机器人帮你做什么？',
+          tags: ['#具身智能', '#机器人', '#科技改变生活', '#AI']
+        },
+        {
+          title: '3个月，我们从0到10000台',
+          score: 88,
+          style: '故事',
+          duration: 52,
+          text: '【开场：创始人面对镜头】\n\n3个月前，没人相信机器人能进家庭。\n\n【展示早期原型机】\n\n第一台，摔了7次。\n第二台，被孩子当玩具拆了。\n\n【展示改进过程】\n\n第47次迭代，我们做到了。\n\n【展示用户场景】\n\n现在，10000台机器人正在10000个家庭工作。\n\n点击主页，看看它们都在做什么。',
+          tags: ['#创业故事', '#机器人', '#具身智能', '#硬科技']
+        },
+        {
+          title: '选机器人前，先搞懂这3点',
+          score: 85,
+          style: '干货',
+          duration: 38,
+          text: '【开场：直接切入】\n\n买机器人前，这3点必须知道：\n\n【文字卡片：1. 场景适配】\n第一，你家的场景适不适合？\n平层、复式、有没有宠物？\n\n【文字卡片：2. 交互能力】\n第二，交互能力够不够？\n能不能听懂方言？识别手势？\n\n【文字卡片：3. 售后服务】\n第三，售后跟不跟得上？\n\n【展示产品】\n\nXX机器人都能满足，评论区聊。',
+          tags: ['#选购指南', '#机器人', '#干货分享', '#具身智能']
+        }
+      ]
+    };
+
+    let isRunning = false;
+
+    function startRun() {
+      if (isRunning) return;
+
+      const keywords = document.getElementById('keywords').value.trim();
+      if (!keywords) {
+        alert('请输入关键词');
+        return;
+      }
+
+      isRunning = true;
+      const btn = document.getElementById('runBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span>运行中</span><div class="loading-dots"><span></span><span></span><span></span></div>';
+
+      // 显示进度
+      document.getElementById('placeholder').style.display = 'none';
+      document.getElementById('resultContent').classList.remove('active');
+      document.getElementById('progressSteps').classList.add('active');
+
+      // 重置所有步骤
+      document.querySelectorAll('.step').forEach(step => {
+        step.classList.remove('running', 'done', 'error');
+        step.classList.add('pending');
+      });
+
+      // 模拟执行流程
+      simulateExecution();
+    }
+
+    async function simulateExecution() {
+      const steps = document.querySelectorAll('.step');
+      
+      for (let i = 0; i < steps.length; i++) {
+        const step = steps[i];
+        step.classList.remove('pending');
+        step.classList.add('running');
+        step.querySelector('.step-icon').innerHTML = '⋯';
+
+        await sleep(800 + Math.random() * 600);
+
+        step.classList.remove('running');
+        step.classList.add('done');
+        step.querySelector('.step-icon').innerHTML = '✓';
+      }
+
+      await sleep(500);
+      showResult(mockResult);
+      
+      isRunning = false;
+      const btn = document.getElementById('runBtn');
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>重新运行';
+    }
+
+    function showResult(data) {
+      document.getElementById('progressSteps').classList.remove('active');
+      document.getElementById('resultContent').classList.add('active');
+
+      // 更新统计
+      document.getElementById('stat-collected').textContent = data.collected;
+      document.getElementById('stat-filtered').textContent = data.filtered;
+      document.getElementById('stat-created').textContent = data.created;
+
+      // 爆款因子
+      const factorsHtml = data.viralFactors.map(f => 
+        `<div class="analysis-item">${f}</div>`
+      ).join('');
+      document.getElementById('viralFactors').innerHTML = factorsHtml;
+
+      // 用户痛点
+      const painsHtml = data.painPoints.map(p => 
+        `<div class="analysis-item">${p}</div>`
+      ).join('');
+      document.getElementById('painPoints').innerHTML = painsHtml;
+
+      // 钩子模式
+      const hooksHtml = data.hooks.map(h => 
+        `<div class="analysis-item"><strong>${h.name}：</strong>${h.example}</div>`
+      ).join('');
+      document.getElementById('hookPatterns').innerHTML = hooksHtml;
+
+      // 内容结构
+      const structHtml = `
+        <div class="analysis-item"><strong>开头：</strong>${data.structure.hook}</div>
+        <div class="analysis-item"><strong>发展：</strong>${data.structure.development}</div>
+        <div class="analysis-item"><strong>高潮：</strong>${data.structure.climax}</div>
+        <div class="analysis-item"><strong>结尾：</strong>${data.structure.ending}</div>
+      `;
+      document.getElementById('contentStructure').innerHTML = structHtml;
+
+      // 互动逻辑
+      const engHtml = `
+        <div class="analysis-item"><strong>点赞：</strong>${data.engagement.like}</div>
+        <div class="analysis-item"><strong>评论：</strong>${data.engagement.comment}</div>
+        <div class="analysis-item"><strong>收藏：</strong>${data.engagement.save}</div>
+        <div class="analysis-item"><strong>转发：</strong>${data.engagement.share}</div>
+      `;
+      document.getElementById('engagementLogic').innerHTML = engHtml;
+
+      // 文案列表
+      const scriptsHtml = data.scripts.map(s => `
+        <div class="script-item">
+          <div class="script-header">
+            <div class="script-title">${s.title}</div>
+            <div class="script-score">${s.score}分</div>
+          </div>
+          <div class="script-meta">
+            <span>风格：${s.style}</span>
+            <span>时长：${s.duration}秒</span>
+          </div>
+          <div class="script-text">${s.text}</div>
+          <div class="script-tags">
+            ${s.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+          </div>
+        </div>
+      `).join('');
+      document.getElementById('scriptList').innerHTML = scriptsHtml;
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById('tab-' + tabName).classList.add('active');
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+  </script>
+</body>
+</html>
