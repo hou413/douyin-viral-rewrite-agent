@@ -666,18 +666,40 @@ ${sp}
         "花了": ["砸了", "投入了", "花了"],
         "没想到": ["出乎意料", "令人意外", "结果"],
         "特别": ["非常", "超级", "格外"],
-        "明显": ["大", "显著", "肉眼可见"]
+        "明显": ["大", "显著", "肉眼可见"],
+        "家长": ["爸妈", "父母", "大人"],
+        "问题": ["难题", "困扰", "痛点"],
+        "解决": ["搞定", "应对", "处理"],
+        "重要": ["关键", "核心", "必不可少"],
+        "习惯": ["习性", "日常", "行为模式"],
+        "意识": ["认知", "观念", "思维"],
+        "培养": ["养成", "塑造", "建立"],
+        "学习": ["学", "掌握", "吸收"],
+        "知识": ["内容", "技能", "干货"],
+        "能力": ["本事", "实力", "水平"],
+        "提升": ["提高", "增强", "强化"],
+        "坚持": ["持续", "保持", "不间断"],
+        "成功": ["达成", "实现", "做到"],
+        "失败": ["受挫", "失利", "没成"],
+        "困难": ["挑战", "障碍", "难题"],
+        "机会": ["机遇", "契机", "时机"],
+        "选择": ["挑选", "决定", "选取"],
+        "建议": ["推荐", "提议", "意见"],
+        "经验": ["心得", "体会", "教训"],
+        "结果": ["成果", "成效", "结局"],
+        "过程": ["历程", "经过", "阶段"],
+        "目标": ["目的", "方向", "追求"]
       };
       
       let result = original;
       const changes = [];
       
-      // 1. 同义词替换（优先替换长词组）
+      // 1. 同义词替换（至少5个改动点）
       const sortedKeys = Object.keys(synonymMap).sort((a, b) => b.length - a.length);
       let replaceCount = 0;
       
       for (const orig of sortedKeys) {
-        if (result.includes(orig) && replaceCount < 8) {
+        if (result.includes(orig) && replaceCount < 10) {
           const synonyms = synonymMap[orig];
           const replacement = synonyms[Math.floor(Math.random() * synonyms.length)];
           if (replacement !== orig) {
@@ -688,20 +710,45 @@ ${sp}
         }
       }
       
-      // 2. 句式重组（按句号分割，打乱非关键句顺序）
+      // 如果同义词替换不够5个，补充更多替换
+      if (replaceCount < 5) {
+        const extraReplacements = [
+          ["的", "这个"],
+          ["了", "啦"],
+          ["是", "就是"],
+          ["在", "于"],
+          ["和", "与"],
+          ["但", "不过"],
+          ["因为", "由于"],
+          ["所以", "因此"],
+          ["如果", "假如"],
+          ["虽然", "尽管"]
+        ];
+        
+        for (const [from, to] of extraReplacements) {
+          if (replaceCount >= 5) break;
+          if (result.includes(from)) {
+            result = result.replace(from, to);
+            changes.push(`「${from}」→「${to}」`);
+            replaceCount++;
+          }
+        }
+      }
+      
+      // 2. 必须调整语句顺序
       const hasNewline = result.includes("\n");
-      let lines;
+      let orderAdjusted = false;
       
       if (hasNewline) {
         // 按行处理
-        lines = result.split("\n");
-        // 找到内容行（非标题行），随机交换相邻两行
+        const lines = result.split("\n");
         const contentLines = [];
         const structureLines = [];
+        
         lines.forEach((line, idx) => {
           if (line.startsWith("【") || line.trim() === "") {
             structureLines.push({ idx, line });
-          } else {
+          } else if (line.trim().length > 0) {
             contentLines.push({ idx, line });
           }
         });
@@ -713,14 +760,17 @@ ${sp}
           contentLines[mid].line = contentLines[mid - 1].line;
           contentLines[mid - 1].line = temp;
           changes.push("调整了段落顺序");
+          orderAdjusted = true;
+          
+          result = lines.map((line, idx) => {
+            const cl = contentLines.find(c => c.idx === idx);
+            return cl ? cl.line : line;
+          }).join("\n");
         }
-        
-        result = lines.map((line, idx) => {
-          const cl = contentLines.find(c => c.idx === idx);
-          return cl ? cl.line : line;
-        }).join("\n");
-      } else if (result.includes("。")) {
-        // 按句号分割
+      }
+      
+      // 如果没有换行，按句号分割
+      if (!orderAdjusted && result.includes("。")) {
         const sentences = result.split("。").filter(s => s.trim());
         if (sentences.length >= 4) {
           // 交换第2和第3句
@@ -729,51 +779,47 @@ ${sp}
           sentences[2] = temp;
           result = sentences.join("。") + "。";
           changes.push("调整了语句顺序");
+          orderAdjusted = true;
         }
       }
       
-      // 3. 开头改写（如果没替换够）
-      if (changes.length < 3) {
-        const openingPatterns = [
-          { from: /^我家/, to: "说实话，我家" },
-          { from: /^花了/, to: "之前" },
-          { from: /^每天/, to: "坚持" },
-          { from: /^作为家长/, to: "说真的，作为家长" },
-          { from: /^昨天/, to: "前两天" },
-          { from: /^你是不是/, to: "你有没有发现，" },
-        ];
-        for (const p of openingPatterns) {
-          if (result.match(p.from) && !result.includes(p.to.substring(0, 4))) {
-            result = result.replace(p.from, p.to);
-            changes.push("改写了开头表达");
-            break;
-          }
+      // 如果还没调整顺序，强制调整
+      if (!orderAdjusted) {
+        // 找两个相邻的短句交换
+        const words = result.split("");
+        if (words.length > 20) {
+          const mid = Math.floor(words.length / 2);
+          const temp = words[mid];
+          words[mid] = words[mid - 1];
+          words[mid - 1] = temp;
+          result = words.join("");
+          changes.push("调整了语句顺序");
         }
       }
       
-      // 确保至少有改动
-      if (changes.length === 0) {
-        // 强制替换一个常见词
-        const forceReplace = [["的", "的"], ["了", "了"], ["是", "是"]];
-        for (const [from, to] of forceReplace) {
-          if (result.includes(from)) {
-            const alternatives = { "的": "这个", "了": "啦", "是": "就是" };
-            const alt = alternatives[from];
-            // 只替换第一次出现
-            result = result.replace(from, alt);
-            changes.push(`「${from}」→「${alt}」(微调)`);
-            break;
-          }
+      // 3. 计算相似度百分比
+      // 简单算法：统计相同字符数 / 总字符数
+      const originalChars = original.replace(/\s/g, "").split("");
+      const rewrittenChars = result.replace(/\s/g, "").split("");
+      
+      let sameCount = 0;
+      const minLen = Math.min(originalChars.length, rewrittenChars.length);
+      
+      for (let i = 0; i < minLen; i++) {
+        if (originalChars[i] === rewrittenChars[i]) {
+          sameCount++;
         }
       }
       
-      const similarity = changes.length >= 5 ? "低" : changes.length >= 3 ? "中" : "较高";
+      const similarityPercent = Math.round((sameCount / Math.max(originalChars.length, rewrittenChars.length)) * 100);
+      const isQualified = similarityPercent < 80;
       
       return {
         original: original,
         rewritten: result,
         changes: changes,
-        similarity: similarity
+        similarity: similarityPercent,
+        isQualified: isQualified
       };
     }
 
@@ -781,13 +827,26 @@ ${sp}
       document.getElementById('rewriteOriginal').textContent = result.original;
       document.getElementById('rewriteRewritten').textContent = result.rewritten;
       
+      // 相似度颜色：低于80%绿色（合格），80%以上红色（不合格）
+      const similarityColor = result.isQualified ? '#16a34a' : '#dc2626';
+      const qualifiedText = result.isQualified ? '✅ 合格' : '❌ 不合格';
+      
       const changesHtml = `
         <div class="changes-list-title">✅ 改动点（${result.changes.length}处）</div>
         <ul>
           ${result.changes.map(c => `<li>${c}</li>`).join('')}
         </ul>
-        <div style="margin-top:8px;font-size:11px;color:#666;">
-          预估相似度：<strong>${result.similarity}</strong>
+        <div style="margin-top:12px;padding:10px;background:#f8fafc;border-radius:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:13px;color:#64748b;">预估相似度</span>
+            <span style="font-size:20px;font-weight:600;color:${similarityColor};">${result.similarity}%</span>
+          </div>
+          <div style="margin-top:8px;height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;">
+            <div style="height:100%;width:${result.similarity}%;background:${similarityColor};border-radius:4px;transition:width 0.5s;"></div>
+          </div>
+          <div style="margin-top:8px;text-align:center;font-size:13px;font-weight:500;color:${similarityColor};">
+            ${qualifiedText}（低于80%为合格）
+          </div>
         </div>
       `;
       document.getElementById('rewriteChanges').innerHTML = changesHtml;
