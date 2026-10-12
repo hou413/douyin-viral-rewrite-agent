@@ -744,15 +744,13 @@ ${sp}
           }
         }
         
-        // 计算相似度（基于编辑距离的简化版）
-        const similarityPercent = calculateSimilarity(original, result);
-        const isQualified = similarityPercent < 80;
+        // 判断是否合格（改动3处以上算合格）
+        const isQualified = changes.length >= 3;
         
         versions.push({
           version: v + 1,
           rewritten: result,
           changes: changes,
-          similarity: similarityPercent,
           isQualified: isQualified
         });
       }
@@ -763,52 +761,7 @@ ${sp}
       };
     }
     
-    // 计算相似度（基于编辑距离）
-    function calculateSimilarity(original, rewritten) {
-      const orig = original.replace(/\s+/g, '');
-      const rewr = rewritten.replace(/\s+/g, '');
-      
-      // 如果完全相同，返回100%
-      if (orig === rewr) return 100;
-      
-      // 计算编辑距离
-      const distance = levenshteinDistance(orig, rewr);
-      const maxLen = Math.max(orig.length, rewr.length);
-      
-      // 相似度 = (1 - 编辑距离/最大长度) * 100
-      const similarity = Math.round((1 - distance / maxLen) * 100);
-      return Math.max(0, Math.min(100, similarity));
-    }
-    
-    // 计算编辑距离（Levenshtein distance）
-    function levenshteinDistance(str1, str2) {
-      const m = str1.length;
-      const n = str2.length;
-      
-      // 创建二维数组
-      const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
-      
-      // 初始化
-      for (let i = 0; i <= m; i++) dp[i][0] = i;
-      for (let j = 0; j <= n; j++) dp[0][j] = j;
-      
-      // 动态规划计算
-      for (let i = 1; i <= m; i++) {
-        for (let j = 1; j <= n; j++) {
-          if (str1[i - 1] === str2[j - 1]) {
-            dp[i][j] = dp[i - 1][j - 1];
-          } else {
-            dp[i][j] = Math.min(
-              dp[i - 1][j] + 1,      // 删除
-              dp[i][j - 1] + 1,      // 插入
-              dp[i - 1][j - 1] + 1   // 替换
-            );
-          }
-        }
-      }
-      
-      return dp[m][n];
-    }
+
 
     function renderRewriteResult(result) {
       document.getElementById('rewriteOriginal').textContent = result.original;
@@ -816,17 +769,16 @@ ${sp}
       // 生成6个版本的HTML
       let versionsHtml = '';
       result.versions.forEach((v, idx) => {
-        const similarityColor = v.isQualified ? '#16a34a' : '#dc2626';
-        const qualifiedText = v.isQualified ? '✅ 合格' : '❌ 不合格';
+        const statusColor = v.isQualified ? '#16a34a' : '#dc2626';
+        const statusText = v.isQualified ? '✅ 合格' : '❌ 不合格';
         
         versionsHtml += `
-          <div style="margin-bottom:24px;padding:16px;background:#f8fafc;border-radius:10px;border-left:4px solid ${similarityColor};">
+          <div style="margin-bottom:24px;padding:16px;background:#f8fafc;border-radius:10px;border-left:4px solid ${statusColor};">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
               <div style="font-weight:600;font-size:15px;">版本 ${v.version}</div>
               <div style="display:flex;align-items:center;gap:12px;">
-                <span style="font-size:12px;color:#64748b;">改动 ${v.changes.length} 处</span>
-                <span style="font-size:14px;font-weight:600;color:${similarityColor};">${v.similarity}%</span>
-                <span style="font-size:11px;padding:2px 8px;border-radius:10px;background:${v.isQualified ? '#dcfce7' : '#fee2e2'};color:${similarityColor};">${qualifiedText}</span>
+                <span style="font-size:13px;color:#64748b;">改动 ${v.changes.length} 处</span>
+                <span style="font-size:12px;padding:3px 10px;border-radius:10px;background:${v.isQualified ? '#dcfce7' : '#fee2e2'};color:${statusColor};font-weight:500;">${statusText}</span>
               </div>
             </div>
             <div style="font-size:14px;line-height:1.8;white-space:pre-wrap;background:white;padding:12px;border-radius:8px;">${v.rewritten}</div>
