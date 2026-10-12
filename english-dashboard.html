@@ -515,69 +515,115 @@
       const library = getLibrary();
       const scripts = [];
       
+      // 更丰富的钩子库
       const hooks = {
         "痛点型": [
-          "你家孩子是不是也不敢开口说英语？",
-          "很多家长都在纠结孩子学英语没效果，其实解决方法很简单。",
-          "如果你家孩子也有这个问题，一定要看完。"
+          "你家孩子是不是也不敢开口说英语？考试能考90分，一见到老外就往后躲。",
+          "很多家长都在纠结，孩子学英语好几年了，还是哑巴英语。",
+          "如果你家孩子也有这个问题，一定要看完，3分钟后你就能找到答案。",
+          "花了几万块报英语班，孩子还是不会说，你是不是也遇到过这种情况？"
         ],
         "对比型": [
           "以前我也觉得孩子学英语没办法，后来发现一个方法，效果完全不一样。",
           "别人家孩子已经能跟老外对话了，你家孩子还在背单词？",
-          "花了2万块没效果，换个方法一个月就见效了。"
+          "花了2万块没效果，换个方法一个月就见效了。",
+          "同样是学英语，为什么有的孩子3个月就能开口说，有的学3年还是哑巴英语？"
         ],
         "共鸣型": [
           "作为家长，我最怕的就是孩子不敢开口说英语。",
           "你是不是也担心孩子英语学不好？我找到了解决方案。",
-          "每个家长都希望孩子英语好，但方法很重要。"
+          "每个家长都希望孩子英语好，但方法很重要。",
+          "说真的，教孩子学英语，我也崩溃过无数次。"
         ],
         "场景型": [
           "昨天带孩子去商场，遇到一个外国小朋友，我家孩子躲在我身后...",
           "每次见到外国人，你家孩子是不是也往后躲？",
-          "在小区遇到老外打招呼，孩子一句话都说不出来。"
+          "在小区遇到老外打招呼，孩子一句话都说不出来。",
+          "上周带孩子去餐厅，隔壁桌有个外国人在吃饭..."
         ],
         "数据型": [
           "每天15分钟，3个月后你家孩子敢开口说英语了。",
           "90%的家长不知道，这个方法能让孩子主动学英语。",
-          "坚持一个月，孩子发音比我还标准。"
+          "坚持一个月，孩子发音比我还标准。",
+          "我调查了100个家庭，发现英语好的孩子都有这个共同点。"
         ]
       };
       
       const sellingPoints = [
-        "外教1对1，纯正美式发音",
-        "游戏化教学，孩子主动学",
-        "每天15分钟，效果看得见",
-        "AI智能纠音，发音更标准"
+        "外教1对1，纯正美式发音，孩子跟着学，发音越来越地道",
+        "游戏化教学，孩子觉得是在玩，其实是在学，每天主动要求上课",
+        "每天15分钟，不耽误其他学习，但效果看得见",
+        "AI智能纠音，发音不对马上纠正，比我自己教强多了"
+      ];
+      
+      const painPoints = [
+        "很多孩子学英语几年，考试能考90分，但就是不敢开口说。见到外国人就躲，上课不敢举手发言，口语考试更是紧张得说不出话。",
+        "报了很多英语班，花了几万块，但孩子还是不会说。老师讲语法、讲单词，但就是不开口练，学了跟没学一样。",
+        "家长自己英语不好，想教也教不了。发音不标准，怕把孩子带偏了。请家教又太贵，一小时好几百。",
+        "孩子对英语没兴趣，一让他学英语就抵触。背单词痛苦，读课文更痛苦，每次都要催着哄着才肯学。"
+      ];
+      
+      const effects = [
+        "我家孩子用了之后，变化特别明显。现在敢主动跟老外打招呼了，上次在商场遇到外国小朋友，居然主动上去聊天，把我惊到了。",
+        "坚持了一个月，孩子发音比我还标准。昨天他爸回来，孩子用英语跟他对话，他爸都懵了，说这发音什么时候变这么好的。",
+        "现在孩子每天主动要求上课，说'妈妈我要去跟外教聊天'。从抵触到主动，这个变化让我特别欣慰。",
+        "上个月学校英语演讲比赛，我家孩子居然报名了，还拿了二等奖。老师说他的发音和流利度在全班是最好的。"
+      ];
+      
+      const ctas = [
+        "免费领取试听课，链接在主页。名额有限，先到先得。",
+        "点击主页领取免费体验课，让孩子试试再说。不满意随时退。",
+        "主页有免费试听名额，建议先领一节，让孩子体验一下效果。",
+        "想知道具体怎么操作的，点击主页查看详细教程。"
       ];
       
       for (let i = 0; i < count; i++) {
+        // 从文案库中选择一个案例作为参考
+        const refScript = library[Math.floor(Math.random() * library.length)];
+        
         const type = hookType || Object.keys(hooks)[Math.floor(Math.random() * Object.keys(hooks).length)];
         const hookOptions = hooks[type] || hooks["痛点型"];
         const hook = hookOptions[Math.floor(Math.random() * hookOptions.length)];
         const sp = sellingPoints[Math.floor(Math.random() * sellingPoints.length)];
+        const pain = painPoints[Math.floor(Math.random() * painPoints.length)];
+        const effect = effects[Math.floor(Math.random() * effects.length)];
+        const cta = ctas[Math.floor(Math.random() * ctas.length)];
         
-        const script = `【开头】${hook}
+        // 生成更完整的脚本
+        const script = `【开头 - 3秒】
+${hook}
 
-【痛点】
-很多孩子学英语几年，考试能考90分，但就是不敢开口说。
+【痛点展开 - 10秒】
+${pain}
 
-【解决方案】
-${sp}
+【解决方案 - 15秒】
+后来我给孩子试了XX英语，${sp}。
 
-【效果】
-我家孩子用了之后，变化特别明显。现在敢主动跟老外打招呼了。
+【效果展示 - 12秒】
+${effect}
 
-【CTA】
-免费领取试听课，链接在主页。`;
+【行动号召 - 5秒】
+${cta}`;
+        
+        // 生成画面描述
+        const storyboard = [
+          "画面：孩子低着头，不敢看镜头外的外国人",
+          "画面：展示孩子做题的画面，试卷上写着90分",
+          "画面：孩子对着平板跟外教互动，笑得很开心",
+          "画面：孩子在商场跟外国小朋友聊天的场景",
+          "画面：主页截图，圈出'免费领取试听课'按钮"
+        ];
         
         scripts.push({
           id: `new_${i + 1}`,
-          title: `${type}脚本 ${i + 1}`,
+          title: `${type}脚本 ${i + 1} - ${refScript.title || '原创'}`,
           hook: hook,
           script: script,
-          tags: ["#少儿英语", "#英语口语", "#小学生英语"],
+          storyboard: storyboard,
+          tags: ["#少儿英语", "#英语口语", "#小学生英语", "#英语启蒙"],
           duration: "45秒",
-          created_by: Math.random() > 0.5 ? "AI" : "规则"
+          created_by: "AI",
+          reference: refScript.title
         });
       }
       
@@ -604,11 +650,20 @@ ${sp}
                 <span class="script-badge ${s.created_by === 'AI' ? 'badge-ai' : 'badge-rule'}">${s.created_by}</span>
               </div>
               <div class="script-content">${s.script}</div>
+              ${s.storyboard ? `
+                <div style="margin-top:12px;padding:10px;background:#f8fafc;border-radius:6px;">
+                  <div style="font-size:12px;font-weight:600;color:#64748b;margin-bottom:6px;">📹 分镜建议</div>
+                  <div style="font-size:12px;color:#64748b;line-height:1.6;">
+                    ${s.storyboard.map((sb, idx) => `${idx + 1}. ${sb}`).join('<br>')}
+                  </div>
+                </div>
+              ` : ''}
               <div class="script-tags">
                 ${s.tags.map(t => `<span class="tag">${t}</span>`).join('')}
               </div>
               <div class="script-meta">
                 <span>时长：${s.duration}</span>
+                ${s.reference ? `<span>参考：${s.reference}</span>` : ''}
               </div>
             </div>
           `).join('')}
