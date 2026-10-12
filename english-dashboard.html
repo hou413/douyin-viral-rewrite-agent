@@ -430,7 +430,7 @@
     }
 
     // ========== 核心改写功能 ==========
-    function startRewrite() {
+    async function startRewrite() {
       const input = document.getElementById('rewriteInput').value.trim();
       if (!input) {
         alert('请输入要改写的文案');
@@ -446,37 +446,83 @@
       document.getElementById('rewriteResults').innerHTML = '';
       document.getElementById('rewriteBtn').disabled = true;
       
-      setTimeout(() => {
+      try {
         const allResults = [];
         
-        scripts.forEach((script, idx) => {
-          const versions = rewriteScript(script, versionCount);
+        for (let idx = 0; idx < scripts.length; idx++) {
+          const script = scripts[idx];
+          const versions = await rewriteScript(script, versionCount);
           allResults.push({
             original: script,
             versions: versions,
             index: idx + 1
           });
-        });
+        }
         
         renderResults(allResults);
         saveToHistory(input, allResults);
         
+      } catch (error) {
+        console.error('改写失败:', error);
+        alert('改写失败: ' + error.message);
+      } finally {
         document.getElementById('rewriteLoading').classList.remove('active');
         document.getElementById('rewriteBtn').disabled = false;
-      }, 1000);
+      }
     }
 
-    function rewriteScript(original, versionCount) {
+    // 后端 API 地址
+    const API_BASE = 'http://localhost:8000';
+
+    async function rewriteScript(original, versionCount) {
+      try {
+        // 调用后端 AI 改写
+        const response = await fetch(`${API_BASE}/api/rewrite`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            original: original,
+            versionCount: versionCount
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (!data.success) {
+          throw new Error(data.error || '改写失败');
+        }
+        
+        // 为每个版本检测敏感词
+        const versions = data.versions.map(v => {
+          const sensitiveWords = detectSensitiveWords(v.rewritten);
+          return {
+            ...v,
+            sensitiveWords: sensitiveWords,
+            isQualified: v.changes.length >= 3
+          };
+        });
+        
+        return versions;
+        
+      } catch (error) {
+        console.error('AI 改写失败:', error);
+        // 降级为前端规则改写
+        return rewriteScriptFallback(original, versionCount);
+      }
+    }
+
+    // 降级方案：前端规则改写
+    function rewriteScriptFallback(original, versionCount) {
       const versions = [];
       
       for (let v = 0; v < versionCount; v++) {
         let result = original;
         const changes = [];
         
-        // 同义词替换（固定替换6-10个词）
-        const replaceCount = 6 + Math.floor(Math.random() * 5);
-        
-        // 同义词替换
         const synonymMap = {
           "我家孩子": ["我娃", "我家小朋友", "我家宝贝"],
           "你家孩子": ["你家娃", "你家小朋友", "你家宝贝"],
@@ -493,84 +539,28 @@
           "方法": ["方式", "办法", "路子"],
           "后来": ["结果", "之后", "再后来"],
           "发现": ["找到", "了解到", "接触到"],
-          "报了很多班": ["花了不少钱上课", "试了好几个培训班", "报了一堆课"],
-          "不敢开口": ["不敢张嘴", "开不了口", "不好意思说"],
-          "外国人": ["老外", "外国友人", "native speaker"],
-          "打招呼": ["聊天", "对话", "交流"],
-          "游戏化教学": ["边玩边学", "趣味课堂", "互动式学习"],
-          "发音": ["口语", "读音", "语音"],
-          "标准": ["地道", "纯正", "好听"],
-          "试听课": ["体验课", "免费体验", "试听名额"],
-          "链接在主页": ["点击主页领取", "主页有入口", "主页可以领"],
-          "花了": ["砸了", "投入了", "花了"],
-          "没想到": ["出乎意料", "令人意外", "结果"],
-          "特别": ["非常", "超级", "格外"],
-          "明显": ["大", "显著", "肉眼可见"],
           "家长": ["爸妈", "父母", "大人"],
           "问题": ["难题", "困扰", "痛点"],
-          "解决": ["搞定", "应对", "处理"],
-          "重要": ["关键", "核心", "必不可少"],
-          "习惯": ["习性", "日常", "行为模式"],
-          "意识": ["认知", "观念", "思维"],
-          "培养": ["养成", "塑造", "建立"],
-          "学习": ["学", "掌握", "吸收"],
-          "知识": ["内容", "技能", "干货"],
-          "能力": ["本事", "实力", "水平"],
-          "提升": ["提高", "增强", "强化"],
-          "坚持": ["持续", "保持", "不间断"],
-          "成功": ["达成", "实现", "做到"],
-          "失败": ["受挫", "失利", "没成"],
-          "困难": ["挑战", "障碍", "难题"],
-          "机会": ["机遇", "契机", "时机"],
-          "选择": ["挑选", "决定", "选取"],
-          "建议": ["推荐", "提议", "意见"],
-          "经验": ["心得", "体会", "教训"],
-          "结果": ["成果", "成效", "结局"],
-          "过程": ["历程", "经过", "阶段"],
-          "目标": ["目的", "方向", "追求"]
+          "解决": ["搞定", "应对", "处理"]
         };
         
-        // 随机选择词进行替换
         const sortedKeys = Object.keys(synonymMap).sort((a, b) => b.length - a.length);
         const shuffledKeys = [...sortedKeys].sort(() => Math.random() - 0.5);
-        let replaceCountActual = 0;
+        let replaceCount = 0;
         
         for (const orig of shuffledKeys) {
-          if (result.includes(orig) && replaceCountActual < replaceCount) {
+          if (result.includes(orig) && replaceCount < 8) {
             const synonyms = synonymMap[orig];
             const replacement = synonyms[Math.floor(Math.random() * synonyms.length)];
             if (replacement !== orig) {
               result = result.replace(orig, replacement);
               changes.push(`「${orig}」→「${replacement}」`);
-              replaceCountActual++;
+              replaceCount++;
             }
           }
         }
         
-        // 如果替换不够，补充虚词替换
-        if (replaceCountActual < 3) {
-          const extraReplacements = [
-            ["的", "这个"], ["了", "啦"], ["是", "就是"],
-            ["在", "于"], ["和", "与"], ["但", "不过"],
-            ["因为", "由于"], ["所以", "因此"], ["如果", "假如"]
-          ];
-          
-          const shuffledExtra = [...extraReplacements].sort(() => Math.random() - 0.5);
-          
-          for (const [from, to] of shuffledExtra) {
-            if (replaceCountActual >= 3) break;
-            if (result.includes(from)) {
-              result = result.replace(from, to);
-              changes.push(`「${from}」→「${to}」`);
-              replaceCountActual++;
-            }
-          }
-        }
-        
-        // 检测敏感词
         const sensitiveWords = detectSensitiveWords(result);
-        
-        // 判断是否合格（改动3处以上）
         const isQualified = changes.length >= 3;
         
         versions.push({
