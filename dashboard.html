@@ -3,14 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>抖音爆款改写Agent</title>
+  <title>抖音爆款内容增长Agent - 多Agent协作系统</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
       --primary: #6366f1;
       --primary-hover: #4f46e5;
@@ -23,7 +18,6 @@
       --warning: #f59e0b;
       --error: #ef4444;
     }
-
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: var(--bg);
@@ -31,400 +25,131 @@
       line-height: 1.6;
       min-height: 100vh;
     }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 40px 24px;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 48px;
-    }
-
-    h1 {
-      font-size: 28px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .subtitle {
-      color: var(--text-muted);
-      font-size: 15px;
-    }
-
-    .main-grid {
-      display: grid;
-      grid-template-columns: 1fr 1.5fr;
-      gap: 32px;
-    }
-
-    @media (max-width: 900px) {
-      .main-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .card {
+    .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+    header { text-align: center; margin-bottom: 32px; }
+    h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
+    .subtitle { color: var(--text-muted); font-size: 15px; }
+    
+    /* 架构概览 */
+    .architecture-section {
       background: var(--card);
       border-radius: 12px;
-      padding: 28px;
+      padding: 24px;
+      margin-bottom: 24px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
-
-    .card-title {
-      font-size: 16px;
+    .section-title {
+      font-size: 18px;
       font-weight: 600;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-muted);
-      margin-bottom: 8px;
-    }
-
-    input, textarea, select {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 14px;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      background: var(--card);
-    }
-
-    input:focus, textarea:focus, select:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 80px;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      width: 100%;
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-hover);
-    }
-
-    .btn-primary:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .btn-secondary {
-      background: var(--bg);
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-
-    .btn-secondary:hover {
-      background: var(--border);
-    }
-
-    .result-area {
-      min-height: 400px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .result-placeholder {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-muted);
-      text-align: center;
-      padding: 40px;
-    }
-
-    .result-placeholder svg {
-      width: 64px;
-      height: 64px;
       margin-bottom: 16px;
-      opacity: 0.3;
-    }
-
-    .progress-steps {
-      display: none;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .progress-steps.active {
-      display: flex;
-    }
-
-    .step {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      background: var(--bg);
-      border-radius: 8px;
-      font-size: 14px;
+      gap: 8px;
     }
-
-    .step-icon {
-      width: 24px;
-      height: 24px;
+    
+    /* Agent卡片网格 */
+    .agents-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .agent-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s;
+      border: 2px solid transparent;
+    }
+    .agent-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);
+    }
+    .agent-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      font-size: 24px;
+    }
+    .agent-name {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .agent-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    
+    /* 数据流图 */
+    .flow-diagram {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 20px 0;
+    }
+    .flow-steps {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .flow-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 100px;
+    }
+    .flow-step-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--primary);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
+      color: white;
+      font-weight: 600;
+    }
+    .flow-step-label {
       font-size: 12px;
-      flex-shrink: 0;
-    }
-
-    .step.pending .step-icon {
-      background: var(--border);
-      color: var(--text-muted);
-    }
-
-    .step.running .step-icon {
-      background: var(--warning);
-      color: white;
-      animation: pulse 1.5s infinite;
-    }
-
-    .step.done .step-icon {
-      background: var(--success);
-      color: white;
-    }
-
-    .step.error .step-icon {
-      background: var(--error);
-      color: white;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
-    }
-
-    .result-content {
-      display: none;
-    }
-
-    .result-content.active {
-      display: block;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-
-    .stat-card {
-      background: var(--bg);
-      padding: 16px;
-      border-radius: 8px;
       text-align: center;
-    }
-
-    .stat-value {
-      font-size: 24px;
-      font-weight: 600;
-      color: var(--primary);
-    }
-
-    .stat-label {
-      font-size: 12px;
       color: var(--text-muted);
-      margin-top: 4px;
     }
-
-    .script-list {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+    .flow-arrow {
+      color: var(--border);
+      font-size: 20px;
     }
-
-    .script-item {
-      background: var(--bg);
-      border-radius: 8px;
-      padding: 16px;
-    }
-
-    .script-header {
-      display: flex;
-      justify-content: between;
-      align-items: center;
-      margin-bottom: 12px;
-      gap: 12px;
-    }
-
-    .script-title {
-      font-weight: 600;
-      font-size: 15px;
-      flex: 1;
-    }
-
-    .script-score {
-      background: var(--primary);
-      color: white;
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-    .script-meta {
-      display: flex;
-      gap: 12px;
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-    }
-
-    .script-text {
-      font-size: 14px;
-      line-height: 1.7;
-      white-space: pre-wrap;
-      color: var(--text);
+    
+    /* 热榜区域 */
+    .hot-section {
       background: var(--card);
-      padding: 12px;
-      border-radius: 6px;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-
-    .script-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 12px;
-    }
-
-    .tag {
-      background: var(--card);
-      color: var(--primary);
-      padding: 4px 10px;
       border-radius: 12px;
-      font-size: 12px;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 20px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .tab {
-      padding: 10px 16px;
-      font-size: 14px;
-      color: var(--text-muted);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -1px;
-      transition: all 0.2s;
-    }
-
-    .tab:hover {
-      color: var(--text);
-    }
-
-    .tab.active {
-      color: var(--primary);
-      border-bottom-color: var(--primary);
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    .analysis-section {
+      padding: 24px;
       margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
-
-    .analysis-section h4 {
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: var(--text);
-    }
-
-    .analysis-list {
+    .hot-header {
       display: flex;
-      flex-direction: column;
-      gap: 8px;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
     }
-
-    .analysis-item {
-      background: var(--bg);
-      padding: 12px;
-      border-radius: 6px;
-      font-size: 13px;
-    }
-
-    .loading-dots {
-      display: inline-flex;
-      gap: 4px;
-    }
-
-    .loading-dots span {
-      width: 6px;
-      height: 6px;
-      background: var(--primary);
-      border-radius: 50%;
-      animation: bounce 1.4s infinite ease-in-out both;
-    }
-
-    .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
-    .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
-
-    @keyframes bounce {
-      0%, 80%, 100% { transform: scale(0); }
-      40% { transform: scale(1); }
-    }
-
-    /* 热榜样式 */
     .hot-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: 12px;
     }
-
     .hot-item {
       display: flex;
       align-items: center;
@@ -437,12 +162,10 @@
       text-decoration: none;
       color: inherit;
     }
-
     .hot-item:hover {
       background: var(--border);
       transform: translateY(-1px);
     }
-
     .hot-rank {
       width: 28px;
       height: 28px;
@@ -456,16 +179,10 @@
       background: var(--border);
       color: var(--text-muted);
     }
-
     .hot-rank.top1 { background: #ef4444; color: white; }
     .hot-rank.top2 { background: #f97316; color: white; }
     .hot-rank.top3 { background: #eab308; color: white; }
-
-    .hot-info {
-      flex: 1;
-      min-width: 0;
-    }
-
+    .hot-info { flex: 1; min-width: 0; }
     .hot-word {
       font-size: 14px;
       font-weight: 500;
@@ -473,7 +190,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-
     .hot-meta {
       display: flex;
       gap: 8px;
@@ -481,12 +197,7 @@
       font-size: 12px;
       color: var(--text-muted);
     }
-
-    .hot-value {
-      color: #ef4444;
-      font-weight: 500;
-    }
-
+    .hot-value { color: #ef4444; font-weight: 500; }
     .hot-badge {
       display: inline-block;
       padding: 1px 6px;
@@ -494,81 +205,426 @@
       font-size: 11px;
       font-weight: 500;
     }
-
     .hot-badge.hot { background: #fef2f2; color: #ef4444; }
     .hot-badge.new { background: #eff6ff; color: #3b82f6; }
     .hot-badge.rec { background: #f0fdf4; color: #16a34a; }
-
-    .hot-videos {
-      font-size: 12px;
+    
+    /* 主工作区 */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 24px;
+    }
+    @media (max-width: 900px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* 表单 */
+    .form-group { margin-bottom: 16px; }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
       color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    textarea { resize: vertical; min-height: 60px; }
+    
+    /* 按钮 */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: var(--border); }
+    
+    /* 结果区 */
+    .result-area { min-height: 400px; }
+    .result-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 40px;
+      min-height: 300px;
+    }
+    
+    /* 进度步骤 */
+    .progress-steps { display: none; flex-direction: column; gap: 10px; }
+    .progress-steps.active { display: flex; }
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: var(--bg);
+      border-radius: 8px;
+      font-size: 13px;
+    }
+    .step-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
       flex-shrink: 0;
     }
-
+    .step.pending .step-icon { background: var(--border); color: var(--text-muted); }
+    .step.running .step-icon { background: var(--warning); color: white; animation: pulse 1.5s infinite; }
+    .step.done .step-icon { background: var(--success); color: white; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+    
+    /* 结果内容 */
+    .result-content { display: none; }
+    .result-content.active { display: block; }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--bg);
+      padding: 14px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .stat-value { font-size: 22px; font-weight: 600; color: var(--primary); }
+    .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+    
+    /* 评分卡片 */
+    .score-section {
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .score-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .score-total {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .score-grade {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .grade-S { background: #fef3c7; color: #d97706; }
+    .grade-A { background: #dcfce7; color: #16a34a; }
+    .grade-B { background: #dbeafe; color: #2563eb; }
+    .grade-C { background: #f3f4f6; color: #6b7280; }
+    .grade-D { background: #fee2e2; color: #dc2626; }
+    
+    .score-dimensions {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .score-dim {
+      background: var(--card);
+      padding: 12px;
+      border-radius: 8px;
+    }
+    .score-dim-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .score-dim-name { font-size: 13px; font-weight: 500; }
+    .score-dim-value { font-size: 16px; font-weight: 600; color: var(--primary); }
+    .score-dim-bar {
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .score-dim-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 3px;
+      transition: width 0.5s;
+    }
+    
+    /* 脚本列表 */
+    .script-list { display: flex; flex-direction: column; gap: 16px; }
+    .script-item {
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .script-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .script-title { font-weight: 600; font-size: 15px; }
+    .script-score {
+      background: var(--primary);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .script-text {
+      font-size: 13px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      background: var(--card);
+      padding: 12px;
+      border-radius: 6px;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+    .script-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .tag {
+      background: var(--card);
+      color: var(--primary);
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+    }
+    
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .tab {
+      padding: 8px 14px;
+      font-size: 13px;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    /* 诊断报告 */
+    .diagnosis-card {
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border-left: 4px solid var(--warning);
+    }
+    .diagnosis-card.severity-high { border-left-color: var(--error); }
+    .diagnosis-card.severity-low { border-left-color: var(--success); }
+    .diagnosis-title { font-weight: 600; margin-bottom: 8px; }
+    .diagnosis-suggestions {
+      margin-top: 10px;
+      padding-left: 16px;
+    }
+    .diagnosis-suggestions li {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    
+    /* 按钮组 */
+    .btn-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .btn-group .btn { width: auto; padding: 8px 16px; font-size: 13px; }
+    
     .hot-updated {
       text-align: center;
       font-size: 12px;
       color: var(--text-muted);
       margin-top: 12px;
     }
+    
+    /* 加载动画 */
+    .loading-dots { display: inline-flex; gap: 4px; }
+    .loading-dots span {
+      width: 6px;
+      height: 6px;
+      background: white;
+      border-radius: 50%;
+      animation: bounce 1.4s infinite ease-in-out both;
+    }
+    .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1); }
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>🎬 抖音爆款改写Agent</h1>
-      <p class="subtitle">自动采集爆款 → AI分析创作 → 质量评估输出</p>
+      <h1>🎬 抖音爆款内容增长Agent</h1>
+      <p class="subtitle">6大Agent协作 · 数据反馈闭环 · 持续自我进化</p>
     </header>
 
-    <!-- 热榜模块 -->
-    <div class="card" style="margin-bottom: 32px;">
-      <div class="card-title" style="justify-content: space-between;">
-        <span style="display: flex; align-items: center; gap: 8px;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-          </svg>
-          🔥 抖音实时热榜
-        </span>
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <input type="text" id="hotFilter" placeholder="输入关键词过滤..." style="width: 200px; padding: 8px 12px; font-size: 13px;">
-          <button class="btn btn-secondary" style="width: auto; padding: 8px 16px; font-size: 13px;" onclick="fetchHotList()">
-            🔄 刷新
-          </button>
+    <!-- 架构概览 -->
+    <div class="architecture-section">
+      <div class="section-title">🏗️ 多Agent协作架构</div>
+      <div class="agents-grid">
+        <div class="agent-card">
+          <div class="agent-icon">🔥</div>
+          <div class="agent-name">热点情报Agent</div>
+          <div class="agent-desc">监控热榜 · 趋势分析</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-icon">💡</div>
+          <div class="agent-name">爆款选题Agent</div>
+          <div class="agent-desc">情绪分析 · 潜力评分</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-icon">🎬</div>
+          <div class="agent-name">脚本导演Agent</div>
+          <div class="agent-desc">黄金开头 · 传播机制</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-icon">📹</div>
+          <div class="agent-name">视频制作Agent</div>
+          <div class="agent-desc">分镜脚本 · 制作方案</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-icon">📊</div>
+          <div class="agent-name">数据分析Agent</div>
+          <div class="agent-desc">诊断规则 · 表现归因</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-icon">🔄</div>
+          <div class="agent-name">迭代优化Agent</div>
+          <div class="agent-desc">模式总结 · 策略更新</div>
         </div>
       </div>
-      <div id="hotListContainer">
-        <div class="hot-grid" id="hotGrid"></div>
-      </div>
-      <div id="hotEmpty" style="text-align: center; padding: 20px; color: var(--text-muted); display: none;">
-        暂无匹配的热搜内容
+      
+      <div class="flow-diagram">
+        <div class="flow-steps">
+          <div class="flow-step">
+            <div class="flow-step-icon">1</div>
+            <div class="flow-step-label">热点情报<br>09:00</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-step-icon">2</div>
+            <div class="flow-step-label">选题筛选<br>10:00</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-step-icon">3</div>
+            <div class="flow-step-label">脚本创作<br>11:00</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-step-icon">4</div>
+            <div class="flow-step-label">视频制作<br>14:00</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-step-icon">5</div>
+            <div class="flow-step-label">发布追踪<br>发布后</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-step-icon">6</div>
+            <div class="flow-step-label">复盘优化<br>次日</div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="main-grid">
-      <!-- 左侧：输入面板 -->
-      <div class="card">
-        <div class="card-title">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
-          </svg>
-          任务配置
+    <!-- 热榜区域 -->
+    <div class="hot-section">
+      <div class="hot-header">
+        <div class="section-title">🔥 抖音实时热榜</div>
+        <div class="btn-group">
+          <input type="text" id="hotFilter" placeholder="关键词过滤..." style="width:160px;padding:6px 10px;font-size:12px;">
+          <button class="btn btn-secondary" onclick="fetchHotList()">🔄 刷新</button>
         </div>
+      </div>
+      <div class="hot-grid" id="hotGrid"></div>
+      <div class="hot-updated" id="hotUpdated"></div>
+    </div>
 
+    <!-- 主工作区 -->
+    <div class="main-grid">
+      <!-- 左侧：任务配置 -->
+      <div class="card">
+        <div class="card-title">⚙️ 任务配置</div>
+        
         <div class="form-group">
-          <label>关键词 *</label>
+          <label>关键词</label>
           <input type="text" id="keywords" placeholder="多个关键词用逗号分隔" value="机器人,具身智能">
         </div>
-
+        
         <div class="form-group">
           <label>目标受众</label>
-          <input type="text" id="audience" placeholder="描述你的目标用户" value="科技爱好者、创业者">
+          <input type="text" id="audience" value="科技爱好者、创业者">
         </div>
-
-        <div class="form-group">
-          <label>产品信息</label>
-          <textarea id="product" placeholder="产品卖点、核心功能等"></textarea>
-        </div>
-
+        
         <div class="form-group">
           <label>文案风格</label>
           <select id="style">
@@ -577,120 +633,85 @@
             <option value="干货">干货 - 信息密集</option>
           </select>
         </div>
-
-        <button class="btn btn-primary" id="runBtn" onclick="startRun()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon points="5 3 19 12 5 21 5 3"/>
-          </svg>
-          开始运行
+        
+        <button class="btn btn-primary" id="runBtn" onclick="startPipeline()">
+          ▶️ 启动内容流水线
         </button>
+        
+        <div style="margin-top:16px;padding:12px;background:#f8fafc;border-radius:8px;font-size:12px;color:var(--text-muted);">
+          <strong>核心能力：</strong><br>
+          • 发现爆款：热点监控 + 潜力评分<br>
+          • 制造爆款：3种开头 + 传播机制<br>
+          • 复制爆款：数据反馈 + 持续进化
+        </div>
       </div>
 
       <!-- 右侧：结果面板 -->
       <div class="card result-area">
-        <div class="card-title">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-          </svg>
-          执行结果
-        </div>
-
-        <!-- 占位状态 -->
+        <div class="card-title">📋 执行结果</div>
+        
+        <!-- 占位 -->
         <div class="result-placeholder" id="placeholder">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-          </svg>
-          <p>配置左侧参数后点击运行</p>
-          <p style="font-size: 13px; margin-top: 8px;">Agent将自动采集、分析、创作文案</p>
+          <div style="font-size:48px;margin-bottom:16px;">🚀</div>
+          <p>配置参数后点击「启动内容流水线」</p>
+          <p style="font-size:13px;margin-top:8px;">6大Agent将协作完成：热点分析→选题→脚本→评估</p>
         </div>
 
-        <!-- 进度状态 -->
+        <!-- 进度 -->
         <div class="progress-steps" id="progressSteps">
-          <div class="step pending" data-step="1">
-            <div class="step-icon">1</div>
-            <span>爆款采集</span>
-          </div>
-          <div class="step pending" data-step="2">
-            <div class="step-icon">2</div>
-            <span>爆款筛选</span>
-          </div>
-          <div class="step pending" data-step="3">
-            <div class="step-icon">3</div>
-            <span>文案提取</span>
-          </div>
-          <div class="step pending" data-step="4">
-            <div class="step-icon">4</div>
-            <span>AI分析</span>
-          </div>
-          <div class="step pending" data-step="5">
-            <div class="step-icon">5</div>
-            <span>AI创作</span>
-          </div>
-          <div class="step pending" data-step="6">
-            <div class="step-icon">6</div>
-            <span>质量评估</span>
-          </div>
-          <div class="step pending" data-step="7">
-            <div class="step-icon">7</div>
-            <span>结果输出</span>
-          </div>
+          <div class="step pending" data-step="1"><div class="step-icon">1</div><span>🔥 热点情报收集</span></div>
+          <div class="step pending" data-step="2"><div class="step-icon">2</div><span>💡 爆款选题生成</span></div>
+          <div class="step pending" data-step="3"><div class="step-icon">3</div><span>🎬 脚本创作（3种开头）</span></div>
+          <div class="step pending" data-step="4"><div class="step-icon">4</div><span>📊 爆款潜力评估</span></div>
+          <div class="step pending" data-step="5"><div class="step-icon">5</div><span>📹 视频制作方案</span></div>
+          <div class="step pending" data-step="6"><div class="step-icon">6</div><span>🔄 迭代优化建议</span></div>
         </div>
 
-        <!-- 结果内容 -->
+        <!-- 结果 -->
         <div class="result-content" id="resultContent">
           <div class="tabs">
             <div class="tab active" onclick="switchTab('overview')">概览</div>
-            <div class="tab" onclick="switchTab('scripts')">文案</div>
-            <div class="tab" onclick="switchTab('analysis')">分析</div>
+            <div class="tab" onclick="switchTab('score')">评分</div>
+            <div class="tab" onclick="switchTab('scripts')">脚本</div>
+            <div class="tab" onclick="switchTab('mechanism')">传播机制</div>
           </div>
 
           <!-- 概览 -->
           <div class="tab-content active" id="tab-overview">
             <div class="stats-grid">
               <div class="stat-card">
-                <div class="stat-value" id="stat-collected">0</div>
-                <div class="stat-label">采集视频</div>
+                <div class="stat-value" id="stat-hot">0</div>
+                <div class="stat-label">热点</div>
               </div>
               <div class="stat-card">
-                <div class="stat-value" id="stat-filtered">0</div>
-                <div class="stat-label">筛选爆款</div>
+                <div class="stat-value" id="stat-topics">0</div>
+                <div class="stat-label">选题</div>
               </div>
               <div class="stat-card">
-                <div class="stat-value" id="stat-created">0</div>
-                <div class="stat-label">创作文案</div>
+                <div class="stat-value" id="stat-scripts">0</div>
+                <div class="stat-label">脚本</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" id="stat-score">0</div>
+                <div class="stat-label">最高分</div>
               </div>
             </div>
-
-            <div class="analysis-section">
-              <h4>🔥 爆款因子</h4>
-              <div class="analysis-list" id="viralFactors"></div>
-            </div>
-
-            <div class="analysis-section">
-              <h4>🎯 用户痛点</h4>
-              <div class="analysis-list" id="painPoints"></div>
-            </div>
+            <div id="summaryContent"></div>
           </div>
 
-          <!-- 文案 -->
+          <!-- 评分 -->
+          <div class="tab-content" id="tab-score">
+            <div id="scoreContent"></div>
+          </div>
+
+          <!-- 脚本 -->
           <div class="tab-content" id="tab-scripts">
             <div class="script-list" id="scriptList"></div>
           </div>
 
-          <!-- 分析 -->
-          <div class="tab-content" id="tab-analysis">
-            <div class="analysis-section">
-              <h4>钩子模式</h4>
-              <div class="analysis-list" id="hookPatterns"></div>
-            </div>
-            <div class="analysis-section">
-              <h4>内容结构</h4>
-              <div class="analysis-list" id="contentStructure"></div>
-            </div>
-            <div class="analysis-section">
-              <h4>互动逻辑</h4>
-              <div class="analysis-list" id="engagementLogic"></div>
-            </div>
+          <!-- 传播机制 -->
+          <div class="tab-content" id="tab-mechanism">
+            <div id="mechanismContent"></div>
           </div>
         </div>
       </div>
@@ -698,200 +719,6 @@
   </div>
 
   <script>
-    // 模拟数据（实际使用时连接后端API）
-    const mockResult = {
-      collected: 48,
-      filtered: 12,
-      created: 3,
-      viralFactors: [
-        '开头3秒制造认知冲突，引发好奇',
-        '用真实案例替代抽象概念',
-        '痛点场景化，让用户产生代入感',
-        '数据可视化增强说服力'
-      ],
-      painPoints: [
-        '不了解具身智能的实际应用场景',
-        '担心技术落地难度大、成本高',
-        '缺乏可参考的成功案例'
-      ],
-      hooks: [
-        { name: '悬念型', example: '90%的人不知道，机器人已经能...' },
-        { name: '痛点型', example: '你是不是也觉得，XXX太难了？' },
-        { name: '数据型', example: '3个月增长300%，他们做对了什么？' }
-      ],
-      structure: {
-        hook: '前3秒用反常识数据抓住注意力',
-        development: '用2-3个案例展开论证',
-        climax: '核心产品/方案自然引出',
-        ending: 'CTA引导评论+收藏'
-      },
-      engagement: {
-        like: '提供实用干货，让用户觉得有价值',
-        comment: '抛出开放性问题引发讨论',
-        save: '信息密度高，值得反复看',
-        share: '有社交货币属性，展示专业度'
-      },
-      scripts: [
-        {
-          title: '具身智能不再是概念，它已经走进家庭',
-          score: 92,
-          style: '口播',
-          duration: 45,
-          text: '【开场：展示机器人做家务的画面】\n\n你以为机器人还在实验室里？\n\n错了。\n\n【展示产品特写】\n\n这台XX机器人，已经能帮你：\n- 整理房间\n- 照看孩子\n- 陪伴老人\n\n【展示用户反馈截图】\n\n3000个家庭已经在用。\n\n评论区告诉我，你最想让机器人帮你做什么？',
-          tags: ['#具身智能', '#机器人', '#科技改变生活', '#AI']
-        },
-        {
-          title: '3个月，我们从0到10000台',
-          score: 88,
-          style: '故事',
-          duration: 52,
-          text: '【开场：创始人面对镜头】\n\n3个月前，没人相信机器人能进家庭。\n\n【展示早期原型机】\n\n第一台，摔了7次。\n第二台，被孩子当玩具拆了。\n\n【展示改进过程】\n\n第47次迭代，我们做到了。\n\n【展示用户场景】\n\n现在，10000台机器人正在10000个家庭工作。\n\n点击主页，看看它们都在做什么。',
-          tags: ['#创业故事', '#机器人', '#具身智能', '#硬科技']
-        },
-        {
-          title: '选机器人前，先搞懂这3点',
-          score: 85,
-          style: '干货',
-          duration: 38,
-          text: '【开场：直接切入】\n\n买机器人前，这3点必须知道：\n\n【文字卡片：1. 场景适配】\n第一，你家的场景适不适合？\n平层、复式、有没有宠物？\n\n【文字卡片：2. 交互能力】\n第二，交互能力够不够？\n能不能听懂方言？识别手势？\n\n【文字卡片：3. 售后服务】\n第三，售后跟不跟得上？\n\n【展示产品】\n\nXX机器人都能满足，评论区聊。',
-          tags: ['#选购指南', '#机器人', '#干货分享', '#具身智能']
-        }
-      ]
-    };
-
-    let isRunning = false;
-
-    function startRun() {
-      if (isRunning) return;
-
-      const keywords = document.getElementById('keywords').value.trim();
-      if (!keywords) {
-        alert('请输入关键词');
-        return;
-      }
-
-      isRunning = true;
-      const btn = document.getElementById('runBtn');
-      btn.disabled = true;
-      btn.innerHTML = '<span>运行中</span><div class="loading-dots"><span></span><span></span><span></span></div>';
-
-      // 显示进度
-      document.getElementById('placeholder').style.display = 'none';
-      document.getElementById('resultContent').classList.remove('active');
-      document.getElementById('progressSteps').classList.add('active');
-
-      // 重置所有步骤
-      document.querySelectorAll('.step').forEach(step => {
-        step.classList.remove('running', 'done', 'error');
-        step.classList.add('pending');
-      });
-
-      // 模拟执行流程
-      simulateExecution();
-    }
-
-    async function simulateExecution() {
-      const steps = document.querySelectorAll('.step');
-      
-      for (let i = 0; i < steps.length; i++) {
-        const step = steps[i];
-        step.classList.remove('pending');
-        step.classList.add('running');
-        step.querySelector('.step-icon').innerHTML = '⋯';
-
-        await sleep(800 + Math.random() * 600);
-
-        step.classList.remove('running');
-        step.classList.add('done');
-        step.querySelector('.step-icon').innerHTML = '✓';
-      }
-
-      await sleep(500);
-      showResult(mockResult);
-      
-      isRunning = false;
-      const btn = document.getElementById('runBtn');
-      btn.disabled = false;
-      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>重新运行';
-    }
-
-    function showResult(data) {
-      document.getElementById('progressSteps').classList.remove('active');
-      document.getElementById('resultContent').classList.add('active');
-
-      // 更新统计
-      document.getElementById('stat-collected').textContent = data.collected;
-      document.getElementById('stat-filtered').textContent = data.filtered;
-      document.getElementById('stat-created').textContent = data.created;
-
-      // 爆款因子
-      const factorsHtml = data.viralFactors.map(f => 
-        `<div class="analysis-item">${f}</div>`
-      ).join('');
-      document.getElementById('viralFactors').innerHTML = factorsHtml;
-
-      // 用户痛点
-      const painsHtml = data.painPoints.map(p => 
-        `<div class="analysis-item">${p}</div>`
-      ).join('');
-      document.getElementById('painPoints').innerHTML = painsHtml;
-
-      // 钩子模式
-      const hooksHtml = data.hooks.map(h => 
-        `<div class="analysis-item"><strong>${h.name}：</strong>${h.example}</div>`
-      ).join('');
-      document.getElementById('hookPatterns').innerHTML = hooksHtml;
-
-      // 内容结构
-      const structHtml = `
-        <div class="analysis-item"><strong>开头：</strong>${data.structure.hook}</div>
-        <div class="analysis-item"><strong>发展：</strong>${data.structure.development}</div>
-        <div class="analysis-item"><strong>高潮：</strong>${data.structure.climax}</div>
-        <div class="analysis-item"><strong>结尾：</strong>${data.structure.ending}</div>
-      `;
-      document.getElementById('contentStructure').innerHTML = structHtml;
-
-      // 互动逻辑
-      const engHtml = `
-        <div class="analysis-item"><strong>点赞：</strong>${data.engagement.like}</div>
-        <div class="analysis-item"><strong>评论：</strong>${data.engagement.comment}</div>
-        <div class="analysis-item"><strong>收藏：</strong>${data.engagement.save}</div>
-        <div class="analysis-item"><strong>转发：</strong>${data.engagement.share}</div>
-      `;
-      document.getElementById('engagementLogic').innerHTML = engHtml;
-
-      // 文案列表
-      const scriptsHtml = data.scripts.map(s => `
-        <div class="script-item">
-          <div class="script-header">
-            <div class="script-title">${s.title}</div>
-            <div class="script-score">${s.score}分</div>
-          </div>
-          <div class="script-meta">
-            <span>风格：${s.style}</span>
-            <span>时长：${s.duration}秒</span>
-          </div>
-          <div class="script-text">${s.text}</div>
-          <div class="script-tags">
-            ${s.tags.map(t => `<span class="tag">${t}</span>`).join('')}
-          </div>
-        </div>
-      `).join('');
-      document.getElementById('scriptList').innerHTML = scriptsHtml;
-    }
-
-    function switchTab(tabName) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      
-      event.target.classList.add('active');
-      document.getElementById('tab-' + tabName).classList.add('active');
-    }
-
-    function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
     // ========== 热榜功能 ==========
     let hotData = [];
 
@@ -903,50 +730,30 @@
 
     function renderHotList(data) {
       const grid = document.getElementById('hotGrid');
-      const empty = document.getElementById('hotEmpty');
-      
       if (!data || data.length === 0) {
-        grid.style.display = 'none';
-        empty.style.display = 'block';
+        grid.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);grid-column:1/-1;">暂无数据</div>';
         return;
       }
-
-      grid.style.display = 'grid';
-      empty.style.display = 'none';
-
-      grid.innerHTML = data.map((item, idx) => {
+      grid.innerHTML = data.slice(0, 20).map((item, idx) => {
         const rank = idx + 1;
         const rankClass = rank === 1 ? 'top1' : rank === 2 ? 'top2' : rank === 3 ? 'top3' : '';
         const labelMap = {1: '<span class="hot-badge hot">🔥热</span>', 2: '<span class="hot-badge new">🆕新</span>', 3: '<span class="hot-badge rec">🏆推荐</span>'};
         const badge = labelMap[item.label] || '';
         const url = item.group_id ? `https://www.douyin.com/hot/${item.group_id}` : '#';
-        
         return `
-          <a class="hot-item" href="${url}" target="_blank" rel="noopener">
+          <a class="hot-item" href="${url}" target="_blank">
             <div class="hot-rank ${rankClass}">${rank}</div>
             <div class="hot-info">
               <div class="hot-word">${item.word}</div>
               <div class="hot-meta">
                 <span class="hot-value">🔥 ${formatHotValue(item.hot_value)}</span>
                 ${badge}
-                ${item.video_count ? `<span>🎬 ${item.video_count}个视频</span>` : ''}
+                ${item.video_count ? `<span>🎬 ${item.video_count}</span>` : ''}
               </div>
             </div>
           </a>
         `;
       }).join('');
-    }
-
-    function filterHotList() {
-      const keyword = document.getElementById('hotFilter').value.trim().toLowerCase();
-      if (!keyword) {
-        renderHotList(hotData);
-        return;
-      }
-      const filtered = hotData.filter(item => 
-        item.word.toLowerCase().includes(keyword)
-      );
-      renderHotList(filtered);
     }
 
     async function fetchHotList() {
@@ -955,25 +762,223 @@
         const data = await resp.json();
         hotData = data.sort((a, b) => (b.hot_value || 0) - (a.hot_value || 0));
         renderHotList(hotData);
-        
-        // 更新时间
-        let updatedEl = document.querySelector('.hot-updated');
-        if (!updatedEl) {
-          updatedEl = document.createElement('div');
-          updatedEl.className = 'hot-updated';
-          document.getElementById('hotListContainer').appendChild(updatedEl);
-        }
-        const now = new Date();
-        updatedEl.textContent = `更新时间: ${now.toLocaleString('zh-CN')}`;
+        document.getElementById('hotUpdated').textContent = `更新时间: ${new Date().toLocaleString('zh-CN')}`;
       } catch (e) {
-        console.error('获取热榜失败:', e);
-        document.getElementById('hotGrid').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);grid-column:1/-1;">⚠️ 热榜数据加载失败，请稍后刷新</div>';
+        document.getElementById('hotGrid').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);grid-column:1/-1;">⚠️ 热榜数据加载失败</div>';
       }
     }
 
-    // 初始化
-    document.getElementById('hotFilter').addEventListener('input', filterHotList);
+    document.getElementById('hotFilter').addEventListener('input', (e) => {
+      const kw = e.target.value.trim().toLowerCase();
+      if (!kw) { renderHotList(hotData); return; }
+      renderHotList(hotData.filter(item => item.word.toLowerCase().includes(kw)));
+    });
+
     fetchHotList();
+
+    // ========== 流水线功能 ==========
+    let isRunning = false;
+
+    // 模拟数据（演示用）
+    const mockResult = {
+      hotCount: 48,
+      topicCount: 12,
+      scriptCount: 3,
+      topScore: 88,
+      scripts: [
+        {
+          title: '机器人管家真的能替代保姆吗？实测告诉你真相',
+          score: 88,
+          style: '口播',
+          duration: 45,
+          text: '【开头：冲突型】\n你以为机器人还在实验室？大错特错。\n\n【痛点展开】\n你是不是也觉得，请个保姆太贵，自己带娃太累？\n\n【反转】\n真相是：这台XX机器人，已经能帮你整理房间、照看孩子、陪伴老人。\n\n【CTA】\n3000个家庭已经在用。评论区告诉我，你最想让机器人帮你做什么？',
+          tags: ['#具身智能', '#机器人', '#科技改变生活'],
+          mechanism: {
+            target_group: '家庭主妇、科技爱好者',
+            emotion_trigger: '好奇+共鸣',
+            cognitive_conflict: '你以为机器人很远，其实已经走进家庭',
+            content_promise: '实测真相',
+            share_motivation: '社交货币：分享后显得有见识'
+          }
+        },
+        {
+          title: '3个月，从0到10000台，我们做对了什么',
+          score: 82,
+          style: '故事',
+          duration: 52,
+          text: '【开头：悬念型】\n3个月前，没人相信机器人能进家庭。\n\n【故事展开】\n第一台，摔了7次。第二台，被孩子当玩具拆了。\n\n【反转】\n第47次迭代，我们做到了。现在10000台机器人正在10000个家庭工作。\n\n【CTA】\n点击主页，看看它们都在做什么。',
+          tags: ['#创业故事', '#机器人', '#硬科技'],
+          mechanism: {
+            target_group: '创业者、科技从业者',
+            emotion_trigger: '共鸣+励志',
+            cognitive_conflict: '失败47次vs最终成功',
+            content_promise: '创业真相',
+            share_motivation: '利他：对创业者有启发'
+          }
+        },
+        {
+          title: '选机器人前，这3点必须知道',
+          score: 78,
+          style: '干货',
+          duration: 38,
+          text: '【开头：利益型】\n看完这条视频，你能省下至少30%的试错成本。\n\n【干货展开】\n第一，场景适配。第二，交互能力。第三，售后服务。\n\n【CTA】\n关注我，下期告诉你具体怎么选。',
+          tags: ['#选购指南', '#干货分享', '#具身智能'],
+          mechanism: {
+            target_group: '潜在购买者',
+            emotion_trigger: '焦虑+实用',
+            cognitive_conflict: '你以为随便买，其实有讲究',
+            content_promise: '避坑指南',
+            share_motivation: '利他：对朋友有用'
+          }
+        }
+      ],
+      dimensions: [
+        { name: '开头吸引力', weight: 25, score: 8, reasoning: '冲突型开头有效抓住注意力' },
+        { name: '情绪共鸣', weight: 20, score: 9, reasoning: '好奇+共鸣情绪组合强' },
+        { name: '认知反差', weight: 20, score: 8, reasoning: '打破常识，制造惊喜' },
+        { name: '内容价值', weight: 15, score: 7, reasoning: '提供实用信息' },
+        { name: '传播动机', weight: 10, score: 8, reasoning: '社交货币属性强' },
+        { name: '账号匹配度', weight: 10, score: 9, reasoning: '与科技定位高度匹配' }
+      ]
+    };
+
+    function startPipeline() {
+      if (isRunning) return;
+      const keywords = document.getElementById('keywords').value.trim();
+      if (!keywords) { alert('请输入关键词'); return; }
+
+      isRunning = true;
+      const btn = document.getElementById('runBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span>运行中</span><div class="loading-dots"><span></span><span></span><span></span></div>';
+
+      document.getElementById('placeholder').style.display = 'none';
+      document.getElementById('resultContent').classList.remove('active');
+      document.getElementById('progressSteps').classList.add('active');
+
+      document.querySelectorAll('.step').forEach(step => {
+        step.classList.remove('running', 'done');
+        step.classList.add('pending');
+      });
+
+      simulatePipeline();
+    }
+
+    async function simulatePipeline() {
+      const steps = document.querySelectorAll('.step');
+      for (let i = 0; i < steps.length; i++) {
+        const step = steps[i];
+        step.classList.remove('pending');
+        step.classList.add('running');
+        step.querySelector('.step-icon').innerHTML = '⋯';
+        await sleep(600 + Math.random() * 400);
+        step.classList.remove('running');
+        step.classList.add('done');
+        step.querySelector('.step-icon').innerHTML = '✓';
+      }
+      await sleep(300);
+      showResult(mockResult);
+      isRunning = false;
+      const btn = document.getElementById('runBtn');
+      btn.disabled = false;
+      btn.innerHTML = '🔄 重新运行';
+    }
+
+    function showResult(data) {
+      document.getElementById('progressSteps').classList.remove('active');
+      document.getElementById('resultContent').classList.add('active');
+
+      // 统计
+      document.getElementById('stat-hot').textContent = data.hotCount;
+      document.getElementById('stat-topics').textContent = data.topicCount;
+      document.getElementById('stat-scripts').textContent = data.scriptCount;
+      document.getElementById('stat-score').textContent = data.topScore;
+
+      // 概览
+      document.getElementById('summaryContent').innerHTML = `
+        <div style="background:var(--bg);padding:16px;border-radius:10px;margin-top:16px;">
+          <h4 style="margin-bottom:12px;">📋 执行摘要</h4>
+          <ul style="padding-left:20px;font-size:13px;color:var(--text-muted);line-height:2;">
+            <li>从 <strong>${data.hotCount}</strong> 条热点中筛选出 <strong>${data.topicCount}</strong> 个候选选题</li>
+            <li>为 Top ${data.scriptCount} 选题生成脚本，最高评分 <strong>${data.topScore}分</strong></li>
+            <li>每个脚本包含 <strong>3种开头方案</strong>（冲突型/悬念型/利益型）</li>
+            <li>提取传播机制，支持跨赛道复用</li>
+          </ul>
+        </div>
+      `;
+
+      // 评分
+      const totalScore = data.dimensions.reduce((sum, d) => sum + d.score * d.weight / 10, 0);
+      const grade = totalScore >= 90 ? 'S' : totalScore >= 80 ? 'A' : totalScore >= 70 ? 'B' : totalScore >= 60 ? 'C' : 'D';
+      document.getElementById('scoreContent').innerHTML = `
+        <div class="score-section">
+          <div class="score-header">
+            <div>
+              <div class="score-total">${data.topScore}</div>
+              <div style="font-size:12px;color:var(--text-muted);">总分 / 100</div>
+            </div>
+            <div class="score-grade grade-${grade}">${grade}级</div>
+          </div>
+          <div class="score-dimensions">
+            ${data.dimensions.map(d => `
+              <div class="score-dim">
+                <div class="score-dim-header">
+                  <span class="score-dim-name">${d.name} (${d.weight}%)</span>
+                  <span class="score-dim-value">${d.score}/10</span>
+                </div>
+                <div class="score-dim-bar"><div class="score-dim-fill" style="width:${d.score*10}%"></div></div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">${d.reasoning}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      // 脚本
+      document.getElementById('scriptList').innerHTML = data.scripts.map(s => `
+        <div class="script-item">
+          <div class="script-header">
+            <div class="script-title">${s.title}</div>
+            <div class="script-score">${s.score}分</div>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">
+            风格：${s.style} | 时长：${s.duration}秒
+          </div>
+          <div class="script-text">${s.text}</div>
+          <div class="script-tags">${s.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        </div>
+      `).join('');
+
+      // 传播机制
+      document.getElementById('mechanismContent').innerHTML = `
+        <div style="background:var(--bg);padding:20px;border-radius:12px;">
+          <h4 style="margin-bottom:16px;">🧬 传播机制提取</h4>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">
+            不是模仿表面形式，而是提取爆款背后的传播逻辑，支持跨赛道复用
+          </p>
+          ${data.scripts.map((s, i) => `
+            <div style="background:var(--card);padding:16px;border-radius:10px;margin-bottom:12px;">
+              <div style="font-weight:600;margin-bottom:12px;">脚本${i+1}: ${s.title}</div>
+              <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+                <div><span style="color:var(--text-muted);font-size:12px;">目标人群</span><br>${s.mechanism.target_group}</div>
+                <div><span style="color:var(--text-muted);font-size:12px;">情绪触发</span><br>${s.mechanism.emotion_trigger}</div>
+                <div><span style="color:var(--text-muted);font-size:12px;">认知冲突</span><br>${s.mechanism.cognitive_conflict}</div>
+                <div><span style="color:var(--text-muted);font-size:12px;">传播动机</span><br>${s.mechanism.share_motivation}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function switchTab(name) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById('tab-' + name).classList.add('active');
+    }
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
   </script>
 </body>
 </html>

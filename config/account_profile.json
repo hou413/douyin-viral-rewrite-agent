@@ -1,0 +1,15 @@
+{
+  "account_name": "示例账号",
+  "niche": "机器人/具身智能",
+  "target_audience": "科技爱好者、创业者、行业从业者",
+  "content_style": "专业但易懂，有深度",
+  "brand_voice": "权威、前瞻、实用",
+  "conversion_goal": "品牌认知+产品咨询+粉丝增长",
+  "competitors": [],
+  "baseline_metrics": {
+    "avg_like_rate": 0.05,
+    "avg_share_rate": 0.01,
+    "avg_completion_rate": 0.4,
+    "avg_follow_rate": 0.005
+  }
+}
