@@ -637,7 +637,7 @@ ${sp}
     }
 
     function rewriteScript(original) {
-      // 同义词替换表（更丰富）
+      // 同义词替换表
       const synonymMap = {
         "我家孩子": ["我娃", "我家小朋友", "我家宝贝"],
         "你家孩子": ["你家娃", "你家小朋友", "你家宝贝"],
@@ -691,165 +691,153 @@ ${sp}
         "目标": ["目的", "方向", "追求"]
       };
       
-      let result = original;
-      const changes = [];
+      // 生成6个版本
+      const versions = [];
       
-      // 1. 同义词替换（至少5个改动点）
-      const sortedKeys = Object.keys(synonymMap).sort((a, b) => b.length - a.length);
-      let replaceCount = 0;
-      
-      for (const orig of sortedKeys) {
-        if (result.includes(orig) && replaceCount < 10) {
-          const synonyms = synonymMap[orig];
-          const replacement = synonyms[Math.floor(Math.random() * synonyms.length)];
-          if (replacement !== orig) {
-            result = result.replace(orig, replacement);
-            changes.push(`「${orig}」→「${replacement}」`);
-            replaceCount++;
+      for (let v = 0; v < 6; v++) {
+        let result = original;
+        const changes = [];
+        
+        // 同义词替换（至少5个改动点）
+        const sortedKeys = Object.keys(synonymMap).sort((a, b) => b.length - a.length);
+        let replaceCount = 0;
+        
+        // 每个版本随机选择不同的词替换
+        const shuffledKeys = [...sortedKeys].sort(() => Math.random() - 0.5);
+        
+        for (const orig of shuffledKeys) {
+          if (result.includes(orig) && replaceCount < 8) {
+            const synonyms = synonymMap[orig];
+            const replacement = synonyms[Math.floor(Math.random() * synonyms.length)];
+            if (replacement !== orig) {
+              result = result.replace(orig, replacement);
+              changes.push(`「${orig}」→「${replacement}」`);
+              replaceCount++;
+            }
           }
         }
-      }
-      
-      // 如果同义词替换不够5个，补充更多替换
-      if (replaceCount < 5) {
-        const extraReplacements = [
-          ["的", "这个"],
-          ["了", "啦"],
-          ["是", "就是"],
-          ["在", "于"],
-          ["和", "与"],
-          ["但", "不过"],
-          ["因为", "由于"],
-          ["所以", "因此"],
-          ["如果", "假如"],
-          ["虽然", "尽管"]
-        ];
         
-        for (const [from, to] of extraReplacements) {
-          if (replaceCount >= 5) break;
-          if (result.includes(from)) {
-            result = result.replace(from, to);
-            changes.push(`「${from}」→「${to}」`);
-            replaceCount++;
-          }
-        }
-      }
-      
-      // 2. 必须调整语句顺序
-      const hasNewline = result.includes("\n");
-      let orderAdjusted = false;
-      
-      if (hasNewline) {
-        // 按行处理
-        const lines = result.split("\n");
-        const contentLines = [];
-        const structureLines = [];
-        
-        lines.forEach((line, idx) => {
-          if (line.startsWith("【") || line.trim() === "") {
-            structureLines.push({ idx, line });
-          } else if (line.trim().length > 0) {
-            contentLines.push({ idx, line });
-          }
-        });
-        
-        if (contentLines.length >= 3) {
-          // 交换中间两段内容
-          const mid = Math.floor(contentLines.length / 2);
-          const temp = contentLines[mid].line;
-          contentLines[mid].line = contentLines[mid - 1].line;
-          contentLines[mid - 1].line = temp;
-          changes.push("调整了段落顺序");
-          orderAdjusted = true;
+        // 如果替换不够5个，补充更多替换
+        if (replaceCount < 5) {
+          const extraReplacements = [
+            ["的", "这个"],
+            ["了", "啦"],
+            ["是", "就是"],
+            ["在", "于"],
+            ["和", "与"],
+            ["但", "不过"],
+            ["因为", "由于"],
+            ["所以", "因此"],
+            ["如果", "假如"],
+            ["虽然", "尽管"]
+          ];
           
-          result = lines.map((line, idx) => {
-            const cl = contentLines.find(c => c.idx === idx);
-            return cl ? cl.line : line;
-          }).join("\n");
+          const shuffledExtra = [...extraReplacements].sort(() => Math.random() - 0.5);
+          
+          for (const [from, to] of shuffledExtra) {
+            if (replaceCount >= 5) break;
+            if (result.includes(from)) {
+              result = result.replace(from, to);
+              changes.push(`「${from}」→「${to}」`);
+              replaceCount++;
+            }
+          }
         }
+        
+        // 计算相似度（基于编辑距离的简化版）
+        const similarityPercent = calculateSimilarity(original, result);
+        const isQualified = similarityPercent < 80;
+        
+        versions.push({
+          version: v + 1,
+          rewritten: result,
+          changes: changes,
+          similarity: similarityPercent,
+          isQualified: isQualified
+        });
       }
-      
-      // 如果没有换行，按句号分割
-      if (!orderAdjusted && result.includes("。")) {
-        const sentences = result.split("。").filter(s => s.trim());
-        if (sentences.length >= 4) {
-          // 交换第2和第3句
-          const temp = sentences[1];
-          sentences[1] = sentences[2];
-          sentences[2] = temp;
-          result = sentences.join("。") + "。";
-          changes.push("调整了语句顺序");
-          orderAdjusted = true;
-        }
-      }
-      
-      // 如果还没调整顺序，强制调整
-      if (!orderAdjusted) {
-        // 找两个相邻的短句交换
-        const words = result.split("");
-        if (words.length > 20) {
-          const mid = Math.floor(words.length / 2);
-          const temp = words[mid];
-          words[mid] = words[mid - 1];
-          words[mid - 1] = temp;
-          result = words.join("");
-          changes.push("调整了语句顺序");
-        }
-      }
-      
-      // 3. 计算相似度百分比
-      // 简单算法：统计相同字符数 / 总字符数
-      const originalChars = original.replace(/\s/g, "").split("");
-      const rewrittenChars = result.replace(/\s/g, "").split("");
-      
-      let sameCount = 0;
-      const minLen = Math.min(originalChars.length, rewrittenChars.length);
-      
-      for (let i = 0; i < minLen; i++) {
-        if (originalChars[i] === rewrittenChars[i]) {
-          sameCount++;
-        }
-      }
-      
-      const similarityPercent = Math.round((sameCount / Math.max(originalChars.length, rewrittenChars.length)) * 100);
-      const isQualified = similarityPercent < 80;
       
       return {
         original: original,
-        rewritten: result,
-        changes: changes,
-        similarity: similarityPercent,
-        isQualified: isQualified
+        versions: versions
       };
+    }
+    
+    // 计算相似度（基于编辑距离）
+    function calculateSimilarity(original, rewritten) {
+      const orig = original.replace(/\s+/g, '');
+      const rewr = rewritten.replace(/\s+/g, '');
+      
+      // 如果完全相同，返回100%
+      if (orig === rewr) return 100;
+      
+      // 计算编辑距离
+      const distance = levenshteinDistance(orig, rewr);
+      const maxLen = Math.max(orig.length, rewr.length);
+      
+      // 相似度 = (1 - 编辑距离/最大长度) * 100
+      const similarity = Math.round((1 - distance / maxLen) * 100);
+      return Math.max(0, Math.min(100, similarity));
+    }
+    
+    // 计算编辑距离（Levenshtein distance）
+    function levenshteinDistance(str1, str2) {
+      const m = str1.length;
+      const n = str2.length;
+      
+      // 创建二维数组
+      const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
+      
+      // 初始化
+      for (let i = 0; i <= m; i++) dp[i][0] = i;
+      for (let j = 0; j <= n; j++) dp[0][j] = j;
+      
+      // 动态规划计算
+      for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+          if (str1[i - 1] === str2[j - 1]) {
+            dp[i][j] = dp[i - 1][j - 1];
+          } else {
+            dp[i][j] = Math.min(
+              dp[i - 1][j] + 1,      // 删除
+              dp[i][j - 1] + 1,      // 插入
+              dp[i - 1][j - 1] + 1   // 替换
+            );
+          }
+        }
+      }
+      
+      return dp[m][n];
     }
 
     function renderRewriteResult(result) {
       document.getElementById('rewriteOriginal').textContent = result.original;
-      document.getElementById('rewriteRewritten').textContent = result.rewritten;
       
-      // 相似度颜色：低于80%绿色（合格），80%以上红色（不合格）
-      const similarityColor = result.isQualified ? '#16a34a' : '#dc2626';
-      const qualifiedText = result.isQualified ? '✅ 合格' : '❌ 不合格';
+      // 生成6个版本的HTML
+      let versionsHtml = '';
+      result.versions.forEach((v, idx) => {
+        const similarityColor = v.isQualified ? '#16a34a' : '#dc2626';
+        const qualifiedText = v.isQualified ? '✅ 合格' : '❌ 不合格';
+        
+        versionsHtml += `
+          <div style="margin-bottom:24px;padding:16px;background:#f8fafc;border-radius:10px;border-left:4px solid ${similarityColor};">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <div style="font-weight:600;font-size:15px;">版本 ${v.version}</div>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <span style="font-size:12px;color:#64748b;">改动 ${v.changes.length} 处</span>
+                <span style="font-size:14px;font-weight:600;color:${similarityColor};">${v.similarity}%</span>
+                <span style="font-size:11px;padding:2px 8px;border-radius:10px;background:${v.isQualified ? '#dcfce7' : '#fee2e2'};color:${similarityColor};">${qualifiedText}</span>
+              </div>
+            </div>
+            <div style="font-size:14px;line-height:1.8;white-space:pre-wrap;background:white;padding:12px;border-radius:8px;">${v.rewritten}</div>
+            <div style="margin-top:10px;font-size:12px;color:#64748b;">
+              <strong>改动点：</strong>${v.changes.join('、')}
+            </div>
+          </div>
+        `;
+      });
       
-      const changesHtml = `
-        <div class="changes-list-title">✅ 改动点（${result.changes.length}处）</div>
-        <ul>
-          ${result.changes.map(c => `<li>${c}</li>`).join('')}
-        </ul>
-        <div style="margin-top:12px;padding:10px;background:#f8fafc;border-radius:8px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <span style="font-size:13px;color:#64748b;">预估相似度</span>
-            <span style="font-size:20px;font-weight:600;color:${similarityColor};">${result.similarity}%</span>
-          </div>
-          <div style="margin-top:8px;height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;">
-            <div style="height:100%;width:${result.similarity}%;background:${similarityColor};border-radius:4px;transition:width 0.5s;"></div>
-          </div>
-          <div style="margin-top:8px;text-align:center;font-size:13px;font-weight:500;color:${similarityColor};">
-            ${qualifiedText}（低于80%为合格）
-          </div>
-        </div>
-      `;
-      document.getElementById('rewriteChanges').innerHTML = changesHtml;
+      document.getElementById('rewriteRewritten').innerHTML = versionsHtml;
       document.getElementById('rewriteResultCard').style.display = 'block';
     }
 
