@@ -637,55 +637,143 @@ ${sp}
     }
 
     function rewriteScript(original) {
-      // 同义词替换
+      // 同义词替换表（更丰富）
       const synonymMap = {
-        "孩子": ["小朋友", "娃", "宝贝"],
-        "学英语": ["练口语", "开口说", "英语启蒙"],
+        "我家孩子": ["我娃", "我家小朋友", "我家宝贝"],
+        "你家孩子": ["你家娃", "你家小朋友", "你家宝贝"],
+        "孩子": ["小朋友", "娃", "宝贝", "小家伙"],
+        "学英语": ["练口语", "开口说英语", "英语启蒙"],
+        "英语": ["英文", "这门语言"],
         "效果": ["变化", "进步", "提升"],
-        "免费": ["0元", "不花钱", "白嫖"],
-        "每天": ["日常", "坚持", "天天"],
+        "免费": ["0元", "不花一分钱", "白嫖"],
+        "每天": ["天天", "日常", "坚持每天"],
         "关键": ["核心", "重点", "最重要的是"],
         "其实": ["说白了", "说实话", "实际上"],
         "现在": ["目前", "这段时间", "最近"],
         "很多": ["不少", "大量", "许多"],
-        "方法": ["方式", "办法", "途径"]
+        "方法": ["方式", "办法", "路子"],
+        "后来": ["结果", "之后", "再后来"],
+        "发现": ["找到", "了解到", "接触到"],
+        "报了很多班": ["花了不少钱上课", "试了好几个培训班", "报了一堆课"],
+        "不敢开口": ["不敢张嘴", "开不了口", "不好意思说"],
+        "外国人": ["老外", "外国友人", "native speaker"],
+        "打招呼": ["聊天", "对话", "交流"],
+        "游戏化教学": ["边玩边学", "趣味课堂", "互动式学习"],
+        "发音": ["口语", "读音", "语音"],
+        "标准": ["地道", "纯正", "好听"],
+        "试听课": ["体验课", "免费体验", "试听名额"],
+        "链接在主页": ["点击主页领取", "主页有入口", "主页可以领"],
+        "花了": ["砸了", "投入了", "花了"],
+        "没想到": ["出乎意料", "令人意外", "结果"],
+        "特别": ["非常", "超级", "格外"],
+        "明显": ["大", "显著", "肉眼可见"]
       };
       
       let result = original;
       const changes = [];
       
-      // 随机替换3-5个词
-      const keys = Object.keys(synonymMap);
-      const replaceCount = Math.min(5, keys.length);
-      const shuffled = keys.sort(() => 0.5 - Math.random()).slice(0, replaceCount);
+      // 1. 同义词替换（优先替换长词组）
+      const sortedKeys = Object.keys(synonymMap).sort((a, b) => b.length - a.length);
+      let replaceCount = 0;
       
-      for (const orig of shuffled) {
-        if (result.includes(orig)) {
+      for (const orig of sortedKeys) {
+        if (result.includes(orig) && replaceCount < 8) {
           const synonyms = synonymMap[orig];
           const replacement = synonyms[Math.floor(Math.random() * synonyms.length)];
-          result = result.replace(orig, replacement);
-          changes.push(`"${orig}" → "${replacement}"`);
+          if (replacement !== orig) {
+            result = result.replace(orig, replacement);
+            changes.push(`「${orig}」→「${replacement}」`);
+            replaceCount++;
+          }
         }
       }
       
-      // 句式调整
-      if (result.includes("。")) {
-        const sentences = result.split("。");
-        if (sentences.length > 3) {
-          // 随机交换两个句子
-          const idx1 = Math.floor(Math.random() * (sentences.length - 2));
-          const idx2 = idx1 + 1;
-          [sentences[idx1], sentences[idx2]] = [sentences[idx2], sentences[idx1]];
-          result = sentences.join("。");
-          changes.push("调整了句子顺序");
+      // 2. 句式重组（按句号分割，打乱非关键句顺序）
+      const hasNewline = result.includes("\n");
+      let lines;
+      
+      if (hasNewline) {
+        // 按行处理
+        lines = result.split("\n");
+        // 找到内容行（非标题行），随机交换相邻两行
+        const contentLines = [];
+        const structureLines = [];
+        lines.forEach((line, idx) => {
+          if (line.startsWith("【") || line.trim() === "") {
+            structureLines.push({ idx, line });
+          } else {
+            contentLines.push({ idx, line });
+          }
+        });
+        
+        if (contentLines.length >= 3) {
+          // 交换中间两段内容
+          const mid = Math.floor(contentLines.length / 2);
+          const temp = contentLines[mid].line;
+          contentLines[mid].line = contentLines[mid - 1].line;
+          contentLines[mid - 1].line = temp;
+          changes.push("调整了段落顺序");
+        }
+        
+        result = lines.map((line, idx) => {
+          const cl = contentLines.find(c => c.idx === idx);
+          return cl ? cl.line : line;
+        }).join("\n");
+      } else if (result.includes("。")) {
+        // 按句号分割
+        const sentences = result.split("。").filter(s => s.trim());
+        if (sentences.length >= 4) {
+          // 交换第2和第3句
+          const temp = sentences[1];
+          sentences[1] = sentences[2];
+          sentences[2] = temp;
+          result = sentences.join("。") + "。";
+          changes.push("调整了语句顺序");
         }
       }
+      
+      // 3. 开头改写（如果没替换够）
+      if (changes.length < 3) {
+        const openingPatterns = [
+          { from: /^我家/, to: "说实话，我家" },
+          { from: /^花了/, to: "之前" },
+          { from: /^每天/, to: "坚持" },
+          { from: /^作为家长/, to: "说真的，作为家长" },
+          { from: /^昨天/, to: "前两天" },
+          { from: /^你是不是/, to: "你有没有发现，" },
+        ];
+        for (const p of openingPatterns) {
+          if (result.match(p.from) && !result.includes(p.to.substring(0, 4))) {
+            result = result.replace(p.from, p.to);
+            changes.push("改写了开头表达");
+            break;
+          }
+        }
+      }
+      
+      // 确保至少有改动
+      if (changes.length === 0) {
+        // 强制替换一个常见词
+        const forceReplace = [["的", "的"], ["了", "了"], ["是", "是"]];
+        for (const [from, to] of forceReplace) {
+          if (result.includes(from)) {
+            const alternatives = { "的": "这个", "了": "啦", "是": "就是" };
+            const alt = alternatives[from];
+            // 只替换第一次出现
+            result = result.replace(from, alt);
+            changes.push(`「${from}」→「${alt}」(微调)`);
+            break;
+          }
+        }
+      }
+      
+      const similarity = changes.length >= 5 ? "低" : changes.length >= 3 ? "中" : "较高";
       
       return {
         original: original,
         rewritten: result,
         changes: changes,
-        similarity: changes.length > 4 ? "低" : changes.length > 2 ? "中" : "较高"
+        similarity: similarity
       };
     }
 
