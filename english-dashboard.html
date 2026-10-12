@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小学英语赛道 - 抖音爆款脚本工具</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --bg: #fafafa;
+      --card: #ffffff;
+      --text: #1a1a1a;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    header { text-align: center; margin-bottom: 32px; }
+    h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
+    .subtitle { color: var(--text-muted); font-size: 15px; }
+    
+    /* Tabs */
+    .main-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+      background: var(--card);
+      padding: 4px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .main-tab {
+      flex: 1;
+      padding: 14px 20px;
+      text-align: center;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 500;
+      transition: all 0.2s;
+      color: var(--text-muted);
+    }
+    .main-tab:hover { background: var(--bg); }
+    .main-tab.active {
+      background: var(--primary);
+      color: white;
+    }
+    .main-tab-content { display: none; }
+    .main-tab-content.active { display: block; }
+    
+    /* Cards */
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* Grid */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 768px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    
+    /* Form */
+    .form-group { margin-bottom: 16px; }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    textarea { resize: vertical; min-height: 100px; font-family: inherit; }
+    
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: var(--border); }
+    .btn-block { width: 100%; }
+    
+    /* Script output */
+    .script-output {
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+    .script-item {
+      background: var(--card);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border-left: 4px solid var(--primary);
+    }
+    .script-item:last-child { margin-bottom: 0; }
+    .script-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .script-title { font-weight: 600; font-size: 15px; }
+    .script-badge {
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .badge-ai { background: #dbeafe; color: #2563eb; }
+    .badge-rule { background: #f3f4f6; color: #6b7280; }
+    .badge-new { background: #dcfce7; color: #16a34a; }
+    .script-content {
+      font-size: 14px;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      color: var(--text);
+    }
+    .script-meta {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .script-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .tag {
+      background: var(--bg);
+      color: var(--primary);
+      padding: 3px 10px;
+      border-radius: 10px;
+      font-size: 11px;
+    }
+    
+    /* Rewrite comparison */
+    .rewrite-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+    @media (max-width: 768px) {
+      .rewrite-compare { grid-template-columns: 1fr; }
+    }
+    .rewrite-box {
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .rewrite-box-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .rewrite-box-content {
+      font-size: 14px;
+      line-height: 1.8;
+      white-space: pre-wrap;
+    }
+    
+    /* Stats */
+    .stats-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .stat-item {
+      flex: 1;
+      background: var(--bg);
+      padding: 16px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    .stat-value { font-size: 24px; font-weight: 600; color: var(--primary); }
+    .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+    
+    /* Loading */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+    .loading.active { display: block; }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+    .empty-state-icon { font-size: 48px; margin-bottom: 16px; }
+    
+    /* Info box */
+    .info-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #1e40af;
+    }
+    .info-box strong { color: #1e3a8a; }
+    
+    /* Changes list */
+    .changes-list {
+      margin-top: 12px;
+      padding: 12px;
+      background: #f0fdf4;
+      border-radius: 8px;
+      font-size: 12px;
+    }
+    .changes-list-title {
+      font-weight: 600;
+      color: #16a34a;
+      margin-bottom: 6px;
+    }
+    .changes-list ul {
+      padding-left: 20px;
+      color: #15803d;
+    }
+    .changes-list li { margin-bottom: 2px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📚 小学英语赛道 - 抖音爆款脚本工具</h1>
+      <p class="subtitle">批量创作 · 爆款改写 · 防重复检测</p>
+    </header>
+
+    <!-- Main Tabs -->
+    <div class="main-tabs">
+      <div class="main-tab active" onclick="switchMainTab('create')">📝 批量创作</div>
+      <div class="main-tab" onclick="switchMainTab('rewrite')">🔄 爆款改写</div>
+      <div class="main-tab" onclick="switchMainTab('library')">📚 文案库管理</div>
+    </div>
+
+    <!-- Tab 1: 批量创作 -->
+    <div class="main-tab-content active" id="tab-create">
+      <div class="info-box">
+        <strong>💡 使用说明：</strong>基于产品信息和文案库模板，AI自动生成45秒抖音脚本。
+        请先确保 <code>data/product_info.json</code> 和 <code>data/script_library.json</code> 已配置。
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">⚙️ 创作配置</div>
+          
+          <div class="form-group">
+            <label>创作数量</label>
+            <select id="createCount">
+              <option value="3">3 条</option>
+              <option value="5" selected>5 条</option>
+              <option value="10">10 条</option>
+              <option value="20">20 条</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>钩子类型（可选）</label>
+            <select id="hookType">
+              <option value="">随机</option>
+              <option value="痛点型">痛点型 - 戳中家长焦虑</option>
+              <option value="对比型">对比型 - 前后效果对比</option>
+              <option value="共鸣型">共鸣型 - 引发家长共鸣</option>
+              <option value="场景型">场景型 - 具体场景代入</option>
+              <option value="数据型">数据型 - 用数据说话</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>目标受众</label>
+            <input type="text" id="targetAudience" value="6-12岁小学生家长" placeholder="描述目标受众">
+          </div>
+
+          <button class="btn btn-primary btn-block" id="createBtn" onclick="startCreate()">
+            🚀 开始创作
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📋 创作结果</div>
+          <div id="createResult">
+            <div class="empty-state">
+              <div class="empty-state-icon">📝</div>
+              <p>配置参数后点击「开始创作」</p>
+            </div>
+          </div>
+          <div class="loading" id="createLoading">
+            <div class="spinner"></div>
+            <p>正在创作脚本...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: 爆款改写 -->
+    <div class="main-tab-content" id="tab-rewrite">
+      <div class="info-box">
+        <strong>💡 改写原理：</strong>保留核心信息和结构，通过同义词替换、句式重组、场景迁移等方式，
+        降低与原文的相似度，防止被抖音识别为重复内容。
+      </div>
+
+      <div class="card">
+        <div class="card-title">✏️ 输入原文</div>
+        <div class="form-group">
+          <label>粘贴要改写的爆款文案</label>
+          <textarea id="rewriteInput" rows="8" placeholder="粘贴抖音爆款脚本文案..."></textarea>
+        </div>
+        <button class="btn btn-primary btn-block" id="rewriteBtn" onclick="startRewrite()">
+          🔄 开始改写
+        </button>
+      </div>
+
+      <div class="card" id="rewriteResultCard" style="display:none;">
+        <div class="card-title">📋 改写结果</div>
+        <div class="rewrite-compare">
+          <div class="rewrite-box">
+            <div class="rewrite-box-title">📄 原文</div>
+            <div class="rewrite-box-content" id="rewriteOriginal"></div>
+          </div>
+          <div class="rewrite-box" style="background:#f0fdf4;">
+            <div class="rewrite-box-title">✨ 改写后</div>
+            <div class="rewrite-box-content" id="rewriteRewritten"></div>
+          </div>
+        </div>
+        <div class="changes-list" id="rewriteChanges"></div>
+      </div>
+    </div>
+
+    <!-- Tab 3: 文案库管理 -->
+    <div class="main-tab-content" id="tab-library">
+      <div class="info-box">
+        <strong>💡 文案库说明：</strong>文案库是创作的基础素材。把收集到的爆款文案添加到这里，
+        工具会基于这些模板进行创作和改写。
+      </div>
+
+      <div class="card">
+        <div class="card-title">➕ 添加新文案</div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>标题</label>
+            <input type="text" id="newTitle" placeholder="文案标题">
+          </div>
+          <div class="form-group">
+            <label>钩子类型</label>
+            <select id="newHookType">
+              <option value="痛点型">痛点型</option>
+              <option value="对比型">对比型</option>
+              <option value="共鸣型">共鸣型</option>
+              <option value="场景型">场景型</option>
+              <option value="数据型">数据型</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>完整脚本文案</label>
+          <textarea id="newScript" rows="6" placeholder="粘贴完整的爆款脚本文案..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>标签（用逗号分隔）</label>
+          <input type="text" id="newTags" placeholder="#少儿英语, #英语口语, #小学生英语">
+        </div>
+        <button class="btn btn-primary" onclick="addToLibrary()">
+          ➕ 添加到文案库
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📚 当前文案库</div>
+        <div id="libraryList"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ========== 数据存储 ==========
+    const STORAGE_KEY = 'english_primary_scripts';
+    
+    function getLibrary() {
+      const data = localStorage.getItem(STORAGE_KEY);
+      if (data) return JSON.parse(data);
+      // 默认文案库
+      return [
+        {
+          id: "001",
+          title: "孩子不敢开口说英语",
+          original_script: "我家孩子学英语3年，考试能考90分，但是一见到外国人就往后躲。后来我给他报了XX英语，外教1对1，每天15分钟，现在敢主动跟老外打招呼了。关键是游戏化教学，孩子觉得是在玩，不是在学。免费领取试听课，链接在主页。",
+          hook_type: "痛点型",
+          tags: ["#少儿英语", "#英语口语", "#小学生英语"]
+        },
+        {
+          id: "002",
+          title: "报了很多班没效果",
+          original_script: "花了2万块报英语班，孩子还是不会说。后来朋友推荐XX英语，我死马当活马医。结果一个月后，孩子居然主动跟我说英语了！原来是AI智能纠音，发音不对马上纠正。现在孩子发音比我还标准。免费试听，不花一分钱。",
+          hook_type: "对比型",
+          tags: ["#英语培训", "#少儿英语", "#英语学习"]
+        }
+      ];
+    }
+    
+    function saveLibrary(library) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(library));
+    }
+
+    // ========== Tab切换 ==========
+    function switchMainTab(tabName) {
+      document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.main-tab-content').forEach(c => c.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById('tab-' + tabName).classList.add('active');
+      
+      if (tabName === 'library') {
+        renderLibrary();
+      }
+    }
+
+    // ========== 功能1: 批量创作 ==========
+    function startCreate() {
+      const count = parseInt(document.getElementById('createCount').value);
+      const hookType = document.getElementById('hookType').value;
+      const audience = document.getElementById('targetAudience').value;
+      
+      document.getElementById('createResult').style.display = 'none';
+      document.getElementById('createLoading').classList.add('active');
+      document.getElementById('createBtn').disabled = true;
+      
+      // 模拟AI生成（实际应该调用后端API）
+      setTimeout(() => {
+        const scripts = generateScripts(count, hookType, audience);
+        renderCreateResult(scripts);
+        document.getElementById('createLoading').classList.remove('active');
+        document.getElementById('createResult').style.display = 'block';
+        document.getElementById('createBtn').disabled = false;
+      }, 1500);
+    }
+
+    function generateScripts(count, hookType, audience) {
+      const library = getLibrary();
+      const scripts = [];
+      
+      const hooks = {
+        "痛点型": [
+          "你家孩子是不是也不敢开口说英语？",
+          "很多家长都在纠结孩子学英语没效果，其实解决方法很简单。",
+          "如果你家孩子也有这个问题，一定要看完。"
+        ],
+        "对比型": [
+          "以前我也觉得孩子学英语没办法，后来发现一个方法，效果完全不一样。",
+          "别人家孩子已经能跟老外对话了，你家孩子还在背单词？",
+          "花了2万块没效果，换个方法一个月就见效了。"
+        ],
+        "共鸣型": [
+          "作为家长，我最怕的就是孩子不敢开口说英语。",
+          "你是不是也担心孩子英语学不好？我找到了解决方案。",
+          "每个家长都希望孩子英语好，但方法很重要。"
+        ],
+        "场景型": [
+          "昨天带孩子去商场，遇到一个外国小朋友，我家孩子躲在我身后...",
+          "每次见到外国人，你家孩子是不是也往后躲？",
+          "在小区遇到老外打招呼，孩子一句话都说不出来。"
+        ],
+        "数据型": [
+          "每天15分钟，3个月后你家孩子敢开口说英语了。",
+          "90%的家长不知道，这个方法能让孩子主动学英语。",
+          "坚持一个月，孩子发音比我还标准。"
+        ]
+      };
+      
+      const sellingPoints = [
+        "外教1对1，纯正美式发音",
+        "游戏化教学，孩子主动学",
+        "每天15分钟，效果看得见",
+        "AI智能纠音，发音更标准"
+      ];
+      
+      for (let i = 0; i < count; i++) {
+        const type = hookType || Object.keys(hooks)[Math.floor(Math.random() * Object.keys(hooks).length)];
+        const hookOptions = hooks[type] || hooks["痛点型"];
+        const hook = hookOptions[Math.floor(Math.random() * hookOptions.length)];
+        const sp = sellingPoints[Math.floor(Math.random() * sellingPoints.length)];
+        
+        const script = `【开头】${hook}
+
+【痛点】
+很多孩子学英语几年，考试能考90分，但就是不敢开口说。
+
+【解决方案】
+${sp}
+
+【效果】
+我家孩子用了之后，变化特别明显。现在敢主动跟老外打招呼了。
+
+【CTA】
+免费领取试听课，链接在主页。`;
+        
+        scripts.push({
+          id: `new_${i + 1}`,
+          title: `${type}脚本 ${i + 1}`,
+          hook: hook,
+          script: script,
+          tags: ["#少儿英语", "#英语口语", "#小学生英语"],
+          duration: "45秒",
+          created_by: Math.random() > 0.5 ? "AI" : "规则"
+        });
+      }
+      
+      return scripts;
+    }
+
+    function renderCreateResult(scripts) {
+      const html = `
+        <div class="stats-row">
+          <div class="stat-item">
+            <div class="stat-value">${scripts.length}</div>
+            <div class="stat-label">创作数量</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">45秒</div>
+            <div class="stat-label">脚本时长</div>
+          </div>
+        </div>
+        <div class="script-output">
+          ${scripts.map(s => `
+            <div class="script-item">
+              <div class="script-header">
+                <div class="script-title">${s.title}</div>
+                <span class="script-badge ${s.created_by === 'AI' ? 'badge-ai' : 'badge-rule'}">${s.created_by}</span>
+              </div>
+              <div class="script-content">${s.script}</div>
+              <div class="script-tags">
+                ${s.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+              </div>
+              <div class="script-meta">
+                <span>时长：${s.duration}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      document.getElementById('createResult').innerHTML = html;
+    }
+
+    // ========== 功能2: 爆款改写 ==========
+    function startRewrite() {
+      const original = document.getElementById('rewriteInput').value.trim();
+      if (!original) {
+        alert('请输入要改写的文案');
+        return;
+      }
+      
+      document.getElementById('rewriteBtn').disabled = true;
+      document.getElementById('rewriteResultCard').style.display = 'none';
+      
+      // 模拟改写
+      setTimeout(() => {
+        const result = rewriteScript(original);
+        renderRewriteResult(result);
+        document.getElementById('rewriteBtn').disabled = false;
+      }, 1000);
+    }
+
+    function rewriteScript(original) {
+      // 同义词替换
+      const synonymMap = {
+        "孩子": ["小朋友", "娃", "宝贝"],
+        "学英语": ["练口语", "开口说", "英语启蒙"],
+        "效果": ["变化", "进步", "提升"],
+        "免费": ["0元", "不花钱", "白嫖"],
+        "每天": ["日常", "坚持", "天天"],
+        "关键": ["核心", "重点", "最重要的是"],
+        "其实": ["说白了", "说实话", "实际上"],
+        "现在": ["目前", "这段时间", "最近"],
+        "很多": ["不少", "大量", "许多"],
+        "方法": ["方式", "办法", "途径"]
+      };
+      
+      let result = original;
+      const changes = [];
+      
+      // 随机替换3-5个词
+      const keys = Object.keys(synonymMap);
+      const replaceCount = Math.min(5, keys.length);
+      const shuffled = keys.sort(() => 0.5 - Math.random()).slice(0, replaceCount);
+      
+      for (const orig of shuffled) {
+        if (result.includes(orig)) {
+          const synonyms = synonymMap[orig];
+          const replacement = synonyms[Math.floor(Math.random() * synonyms.length)];
+          result = result.replace(orig, replacement);
+          changes.push(`"${orig}" → "${replacement}"`);
+        }
+      }
+      
+      // 句式调整
+      if (result.includes("。")) {
+        const sentences = result.split("。");
+        if (sentences.length > 3) {
+          // 随机交换两个句子
+          const idx1 = Math.floor(Math.random() * (sentences.length - 2));
+          const idx2 = idx1 + 1;
+          [sentences[idx1], sentences[idx2]] = [sentences[idx2], sentences[idx1]];
+          result = sentences.join("。");
+          changes.push("调整了句子顺序");
+        }
+      }
+      
+      return {
+        original: original,
+        rewritten: result,
+        changes: changes,
+        similarity: changes.length > 4 ? "低" : changes.length > 2 ? "中" : "较高"
+      };
+    }
+
+    function renderRewriteResult(result) {
+      document.getElementById('rewriteOriginal').textContent = result.original;
+      document.getElementById('rewriteRewritten').textContent = result.rewritten;
+      
+      const changesHtml = `
+        <div class="changes-list-title">✅ 改动点（${result.changes.length}处）</div>
+        <ul>
+          ${result.changes.map(c => `<li>${c}</li>`).join('')}
+        </ul>
+        <div style="margin-top:8px;font-size:11px;color:#666;">
+          预估相似度：<strong>${result.similarity}</strong>
+        </div>
+      `;
+      document.getElementById('rewriteChanges').innerHTML = changesHtml;
+      document.getElementById('rewriteResultCard').style.display = 'block';
+    }
+
+    // ========== 功能3: 文案库管理 ==========
+    function renderLibrary() {
+      const library = getLibrary();
+      const html = library.map((item, idx) => `
+        <div class="script-item">
+          <div class="script-header">
+            <div class="script-title">${item.title}</div>
+            <span class="script-badge badge-new">${item.hook_type}</span>
+          </div>
+          <div class="script-content" style="max-height:100px;overflow:hidden;">${item.original_script}</div>
+          <div class="script-tags">
+            ${item.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+          </div>
+          <div style="margin-top:10px;">
+            <button class="btn btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="useForRewrite(${idx})">
+              用于改写
+            </button>
+            <button class="btn btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="deleteFromLibrary(${idx})">
+              删除
+            </button>
+          </div>
+        </div>
+      `).join('');
+      
+      document.getElementById('libraryList').innerHTML = html || '<div class="empty-state"><p>文案库为空</p></div>';
+    }
+
+    function addToLibrary() {
+      const title = document.getElementById('newTitle').value.trim();
+      const hookType = document.getElementById('newHookType').value;
+      const script = document.getElementById('newScript').value.trim();
+      const tagsStr = document.getElementById('newTags').value.trim();
+      
+      if (!title || !script) {
+        alert('请填写标题和完整脚本');
+        return;
+      }
+      
+      const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(t => t) : ["#少儿英语"];
+      
+      const library = getLibrary();
+      library.push({
+        id: String(library.length + 1).padStart(3, '0'),
+        title: title,
+        original_script: script,
+        hook_type: hookType,
+        tags: tags
+      });
+      saveLibrary(library);
+      
+      // 清空表单
+      document.getElementById('newTitle').value = '';
+      document.getElementById('newScript').value = '';
+      document.getElementById('newTags').value = '';
+      
+      alert('✅ 已添加到文案库');
+      renderLibrary();
+    }
+
+    function useForRewrite(idx) {
+      const library = getLibrary();
+      const item = library[idx];
+      if (item) {
+        document.getElementById('rewriteInput').value = item.original_script;
+        // 切换到改写tab
+        document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.main-tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.main-tab')[1].classList.add('active');
+        document.getElementById('tab-rewrite').classList.add('active');
+      }
+    }
+
+    function deleteFromLibrary(idx) {
+      if (!confirm('确定要删除这条文案吗？')) return;
+      const library = getLibrary();
+      library.splice(idx, 1);
+      saveLibrary(library);
+      renderLibrary();
+    }
+
+    // 初始化
+    renderLibrary();
+  </script>
+</body>
+</html>
