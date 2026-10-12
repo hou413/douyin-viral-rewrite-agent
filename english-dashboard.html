@@ -272,23 +272,13 @@
           <textarea id="rewriteInput" rows="10" placeholder="粘贴一条或多条抖音爆款脚本文案...&#10;&#10;多条文案请用空行分隔"></textarea>
         </div>
         
-        <div class="grid-2">
-          <div class="form-group">
-            <label>改写强度</label>
-            <select id="rewriteIntensity">
-              <option value="light">轻度 - 只换词，保留原结构</option>
-              <option value="medium" selected>中度 - 换词+调整句式</option>
-              <option value="deep">深度 - 大幅改写，结构重组</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>改写版本数</label>
-            <select id="rewriteVersions">
-              <option value="3">3 个版本</option>
-              <option value="6" selected>6 个版本</option>
-              <option value="10">10 个版本</option>
-            </select>
-          </div>
+        <div class="form-group">
+          <label>改写版本数</label>
+          <select id="rewriteVersions">
+            <option value="3">3 个版本</option>
+            <option value="6" selected>6 个版本</option>
+            <option value="10">10 个版本</option>
+          </select>
         </div>
         
         <button class="btn btn-primary btn-block" id="rewriteBtn" onclick="startRewrite()">
@@ -447,7 +437,6 @@
         return;
       }
       
-      const intensity = document.getElementById('rewriteIntensity').value;
       const versionCount = parseInt(document.getElementById('rewriteVersions').value);
       
       // 分割多条文案
@@ -461,7 +450,7 @@
         const allResults = [];
         
         scripts.forEach((script, idx) => {
-          const versions = rewriteScript(script, intensity, versionCount);
+          const versions = rewriteScript(script, versionCount);
           allResults.push({
             original: script,
             versions: versions,
@@ -477,15 +466,15 @@
       }, 1000);
     }
 
-    function rewriteScript(original, intensity, versionCount) {
+    function rewriteScript(original, versionCount) {
       const versions = [];
       
       for (let v = 0; v < versionCount; v++) {
         let result = original;
         const changes = [];
         
-        // 根据强度决定替换数量
-        const replaceCount = intensity === 'light' ? 3 : intensity === 'medium' ? 6 : 10;
+        // 同义词替换（固定替换6-10个词）
+        const replaceCount = 6 + Math.floor(Math.random() * 5);
         
         // 同义词替换
         const synonymMap = {
@@ -578,19 +567,6 @@
           }
         }
         
-        // 深度改写：调整句式
-        if (intensity === 'deep' && result.includes('。')) {
-          const sentences = result.split('。').filter(s => s.trim());
-          if (sentences.length >= 4) {
-            // 交换第2和第3句
-            const temp = sentences[1];
-            sentences[1] = sentences[2];
-            sentences[2] = temp;
-            result = sentences.join('。') + '。';
-            changes.push('调整了语句顺序');
-          }
-        }
-        
         // 检测敏感词
         const sensitiveWords = detectSensitiveWords(result);
         
@@ -650,9 +626,6 @@
                       </span>
                       <button class="btn btn-secondary btn-sm" onclick="copyVersion(${idx}, ${v.version - 1})">
                         📋 复制
-                      </button>
-                      <button class="btn btn-secondary btn-sm" onclick="showCompare(${idx}, ${v.version - 1})">
-                        🔍 对比
                       </button>
                     </div>
                   </div>
