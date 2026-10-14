@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>抖音爆款改写工具 - 专业版</title>
+  <title>K12小学英语爆款内容工具</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
@@ -222,17 +222,20 @@
 <body>
   <div class="container">
     <header>
-      <h1>🔄 抖音爆款改写工具</h1>
-      <p class="subtitle">专业版 · 批量改写 · 敏感词检测 · 多版本输出</p>
+      <h1>📚 K12小学英语爆款内容工具</h1>
+      <p class="subtitle">专为小学英语赛道打造 · 爆款改写 · 全网选题 · 每日推送</p>
     </header>
 
-
+    <div class="main-tabs">
+      <div class="main-tab active" onclick="switchMainTab('rewrite')">🔄 爆款改写</div>
+      <div class="main-tab" onclick="switchMainTab('topics')">🔥 今日选题</div>
+    </div>
 
     <!-- Tab 1: 爆款改写 -->
     <div class="main-tab-content active" id="tab-rewrite">
       <div class="info-box">
-        <strong>💡 使用说明：</strong>粘贴一条或多条爆款文案，选择改写强度和版本数，自动生成多个改写版本。
-        支持批量改写、敏感词检测、一键复制、高亮对比等功能。
+        <strong>💡 使用说明：</strong>专为K12小学英语赛道设计。粘贴爆款文案，自动生成多个改写版本。
+        内置教育赛道敏感词检测，确保内容合规。
       </div>
 
       <div class="card">
@@ -264,17 +267,54 @@
       <div id="rewriteResults"></div>
     </div>
 
+    <!-- Tab 2: 今日选题 -->
+    <div class="main-tab-content" id="tab-topics">
+      <div class="info-box">
+        <strong>💡 全网选题：</strong>从抖音热榜自动筛选与K12小学英语相关的选题，每日推送5个。
+        AI智能判断选题潜力，包含情绪分析、受众匹配、传播建议。
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          🔥 今日选题推荐
+          <button class="btn btn-primary btn-sm" style="margin-left:auto;" id="fetchTopicsBtn" onclick="fetchTopics()">
+            🎯 获取今日选题
+          </button>
+        </div>
+        <div id="topicsLoading" class="loading">
+          <div class="spinner"></div>
+          <p>正在从抖音热榜筛选K12英语相关选题...</p>
+        </div>
+        <div id="topicsResult"></div>
+      </div>
+    </div>
 
   </div>
 
   <script>
 
+    // ========== Tab切换 ==========
+    function switchMainTab(tabName) {
+      document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.main-tab-content').forEach(c => c.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById('tab-' + tabName).classList.add('active');
+    }
 
-    // ========== 敏感词检测 ==========
+    // ========== K12 敏感词库 ==========
     const SENSITIVE_WORDS = [
+      // 广告法违规
       '最好', '最佳', '第一', '唯一', '首选', '绝对', '100%', '永远',
       '必须', '一定', '保证', '承诺', '最', '极', '超', '顶级', '国家级',
-      '全网', '全网最低', '史上', '独家', '仅限', '秒杀', '抢购'
+      '全网', '全网最低', '史上', '独家', '仅限', '秒杀', '抢购',
+      // 教育赛道违规
+      '保过', '包过', '保分', '包分', '提分神器', '速成', '零基础速成',
+      '名校保送', '免考', '代考', '作弊', '押题', '泄题',
+      // 焦虑营销
+      '输在起跑线', '别的孩子都在学', '再不学就晚了', '落后', '淘汰',
+      '差距越来越大', '别人家的孩子', '你家孩子不如',
+      // 虚假承诺
+      '三天见效', '一周学会', '月入过万', '躺赚', '零风险'
     ];
     
     function detectSensitiveWords(text) {
@@ -599,6 +639,79 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+    }
+
+    // ========== 今日选题功能 ==========
+    async function fetchTopics() {
+      const btn = document.getElementById('fetchTopicsBtn');
+      const loading = document.getElementById('topicsLoading');
+      const result = document.getElementById('topicsResult');
+      
+      btn.disabled = true;
+      btn.textContent = '⏳ 获取中...';
+      loading.classList.add('active');
+      result.innerHTML = '';
+      
+      try {
+        const response = await fetch(`${API_BASE}/api/topics`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ count: 5 })
+        });
+        
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        
+        const data = await response.json();
+        
+        if (!data.success) throw new Error(data.error || '获取失败');
+        
+        renderTopics(data.topics);
+      } catch (error) {
+        console.error('选题获取失败:', error);
+        result.innerHTML = `<div style="padding:20px;text-align:center;color:var(--error);">
+          ⚠️ 获取失败：${error.message}<br>
+          <span style="font-size:12px;color:var(--text-muted);">请确保本地后端服务正在运行（python3 server.py）</span>
+        </div>`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🎯 获取今日选题';
+        loading.classList.remove('active');
+      }
+    }
+
+    function renderTopics(topics) {
+      const result = document.getElementById('topicsResult');
+      
+      if (!topics || topics.length === 0) {
+        result.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);">今日暂无相关选题，请明天再试</div>';
+        return;
+      }
+      
+      result.innerHTML = topics.map((t, i) => `
+        <div style="background:var(--bg);border-radius:12px;padding:20px;margin-bottom:16px;border-left:4px solid ${i < 3 ? 'var(--error)' : 'var(--warning)'};">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <span style="width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:white;background:${i === 0 ? '#ef4444' : i === 1 ? '#f97316' : i === 2 ? '#eab308' : '#6366f1'};">${i + 1}</span>
+            <span style="font-weight:600;font-size:15px;flex:1;">${t.title}</span>
+            <span class="badge badge-success">${t.score}分</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+            <div style="font-size:12px;"><span style="color:var(--text-muted);">🔥 热度：</span>${t.hotValue || '—'}</div>
+            <div style="font-size:12px;"><span style="color:var(--text-muted);">📂 分类：</span>${t.category || '教育'}</div>
+          </div>
+          <div style="background:white;padding:12px;border-radius:8px;margin-bottom:12px;">
+            <div style="font-size:12px;font-weight:600;color:var(--primary);margin-bottom:6px;">💡 选题角度</div>
+            <div style="font-size:13px;line-height:1.7;">${t.angle || '—'}</div>
+          </div>
+          <div style="background:white;padding:12px;border-radius:8px;margin-bottom:12px;">
+            <div style="font-size:12px;font-weight:600;color:var(--primary);margin-bottom:6px;">🎯 目标受众</div>
+            <div style="font-size:13px;line-height:1.7;">${t.audience || '—'}</div>
+          </div>
+          <div style="background:white;padding:12px;border-radius:8px;">
+            <div style="font-size:12px;font-weight:600;color:var(--primary);margin-bottom:6px;">📝 参考标题</div>
+            <div style="font-size:13px;line-height:1.7;color:var(--text);">${(t.suggestedTitles || []).map(t => '• ' + t).join('<br>') || '—'}</div>
+          </div>
+        </div>
+      `).join('');
     }
 
     // 初始化完成
