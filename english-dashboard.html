@@ -250,6 +250,17 @@
             <option value="10">10 个版本</option>
           </select>
         </div>
+
+        <div class="form-group">
+          <label>改写风格</label>
+          <select id="rewriteStyle">
+            <option value="口播">🎙️ 口播 - 直接有力，适合真人出镜</option>
+            <option value="故事">📖 故事 - 情感共鸣，适合品牌叙事</option>
+            <option value="干货">📚 干货 - 信息密集，适合知识分享</option>
+            <option value="搞笑">😂 搞笑 - 轻松幽默，适合泛娱乐</option>
+            <option value="悬念">🤔 悬念 - 制造好奇，适合引流转化</option>
+          </select>
+        </div>
         
         <button class="btn btn-primary btn-block" id="rewriteBtn" onclick="startRewrite()">
           🔄 开始改写
@@ -264,11 +275,59 @@
       <div id="rewriteResults"></div>
     </div>
 
+    <!-- 爆款开头模板库 -->
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">💎 爆款开头模板库</div>
+      <div class="info-box">
+        <strong>💡 使用说明：</strong>点击「套用」按钮，模板会自动填入输入框，然后选择风格开始改写。
+      </div>
+      <div id="templateGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;"></div>
+    </div>
+
 
   </div>
 
   <script>
 
+    // ========== 爆款开头模板库 ==========
+    const OPENING_TEMPLATES = [
+      { name: '冲突型', icon: '💥', desc: '打破认知，制造对立', template: '你以为{主题}还在{旧认知}？大错特错。\n\n真相是：{新事实}。\n\n今天告诉你，{核心内容}。' },
+      { name: '悬念型', icon: '🤔', desc: '引发好奇，留住用户', template: '{时间}前，没人相信{主题}能做到{结果}。\n\n直到{转折事件}发生了。\n\n{核心内容}。' },
+      { name: '利益型', icon: '💰', desc: '直击用户利益点', template: '看完这条视频，你能省下至少{数字}%的{成本}。\n\n{核心内容}，建议收藏反复看。' },
+      { name: '痛点型', icon: '😩', desc: '戳中痛点引发共鸣', template: '你是不是也{痛点描述}？\n\n别急，你不是一个人。\n\n{数字}万人都有这个困扰。今天教你{解决方案}。' },
+      { name: '数据型', icon: '📊', desc: '用数据建立信任', template: '{数字}个{对象}实测后发现：{核心发现}。\n\n不是广告，是真实数据。\n\n{核心内容}。' },
+      { name: '反转型', icon: '🔄', desc: '先抑后扬，制造惊喜', template: '所有人都说{主题}不行。\n\n但我偏不信。\n\n{数字}天后，{反转结果}。\n\n{核心内容}。' },
+      { name: '提问型', icon: '❓', desc: '用问题引导思考', template: '{主题}真的能{期望效果}吗？\n\n我花了{时间}亲测，结果让我意外。\n\n{核心内容}。' },
+      { name: '权威型', icon: '🏆', desc: '借权威背书', template: '{权威来源}最新发布的{报告/研究}显示：{核心发现}。\n\n这意味着什么？\n\n{核心内容}。' },
+      { name: '故事型', icon: '📖', desc: '用故事代入情感', template: '{时间}前，我还是{旧状态}。\n\n直到{触发事件}，一切都变了。\n\n现在{新状态}。今天分享我的{核心内容}。' },
+      { name: '盘点型', icon: '📋', desc: '清单式信息密集', template: '{主题}{数字}大{维度}，第{数字}个90%的人都不知道。\n\n{核心内容}，建议收藏。' },
+      { name: '对比型', icon: '⚖️', desc: '对比制造差异感', template: '{A} vs {B}，到底选哪个？\n\n{数字}年经验告诉我：{核心观点}。\n\n{核心内容}。' },
+      { name: '紧迫型', icon: '⏰', desc: '制造紧迫感促行动', template: '{时间}内必须知道的{主题}变化！\n\n还不知道的人要吃亏了。\n\n{核心内容}。' }
+    ];
+
+    function renderTemplates() {
+      const grid = document.getElementById('templateGrid');
+      grid.innerHTML = OPENING_TEMPLATES.map((t, i) => `
+        <div style="background:var(--bg);border-radius:10px;padding:16px;border:1px solid var(--border);">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <span style="font-size:20px;">${t.icon}</span>
+            <span style="font-weight:600;font-size:14px;">${t.name}</span>
+            <span style="font-size:11px;color:var(--text-muted);margin-left:auto;">${t.desc}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);background:var(--card);padding:10px;border-radius:6px;margin-bottom:10px;line-height:1.7;max-height:80px;overflow:hidden;white-space:pre-wrap;">${t.template}</div>
+          <button class="btn btn-secondary btn-sm" style="width:100%;" onclick="applyTemplate(${i})">📋 套用模板</button>
+        </div>
+      `).join('');
+    }
+
+    function applyTemplate(index) {
+      const t = OPENING_TEMPLATES[index];
+      document.getElementById('rewriteInput').value = t.template;
+      document.getElementById('rewriteInput').focus();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    renderTemplates();
 
     // ========== 敏感词检测 ==========
     const SENSITIVE_WORDS = [
@@ -305,6 +364,7 @@
       }
       
       const versionCount = parseInt(document.getElementById('rewriteVersions').value);
+      const style = document.getElementById('rewriteStyle').value;
       
       // 分割多条文案
       const scripts = input.split(/\n\s*\n/).filter(s => s.trim());
@@ -318,9 +378,10 @@
         
         for (let idx = 0; idx < scripts.length; idx++) {
           const script = scripts[idx];
-          const versions = await rewriteScript(script, versionCount);
+          const versions = await rewriteScript(script, versionCount, style);
           allResults.push({
             original: script,
+            style: style,
             versions: versions,
             index: idx + 1
           });
@@ -340,7 +401,7 @@
     // 后端 API 地址
     const API_BASE = 'http://localhost:8000';
 
-    async function rewriteScript(original, versionCount) {
+    async function rewriteScript(original, versionCount, style) {
       try {
         // 调用后端 AI 改写
         const response = await fetch(`${API_BASE}/api/rewrite`, {
@@ -348,7 +409,8 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             original: original,
-            versionCount: versionCount
+            versionCount: versionCount,
+            style: style
           })
         });
         
@@ -377,13 +439,22 @@
       } catch (error) {
         console.error('AI 改写失败:', error);
         // 降级为前端规则改写
-        return rewriteScriptFallback(original, versionCount);
+        return rewriteScriptFallback(original, versionCount, style);
       }
     }
 
     // 降级方案：前端规则改写
-    function rewriteScriptFallback(original, versionCount) {
+    function rewriteScriptFallback(original, versionCount, style) {
       const versions = [];
+      
+      // 风格化改写策略
+      const styleRules = {
+        '口播': { prefix: '听着，', suffix: '，记住没？', tone: '直接有力' },
+        '故事': { prefix: '故事是这样的——', suffix: '，这就是我的经历。', tone: '情感共鸣' },
+        '干货': { prefix: '划重点：', suffix: '，建议收藏。', tone: '信息密集' },
+        '搞笑': { prefix: '笑死，', suffix: '，哈哈哈懂的都懂。', tone: '轻松幽默' },
+        '悬念': { prefix: '你绝对想不到——', suffix: '，结局让人意外。', tone: '制造好奇' }
+      };
       
       for (let v = 0; v < versionCount; v++) {
         let result = original;
@@ -424,6 +495,17 @@
               replaceCount++;
             }
           }
+        }
+        
+        // 风格化处理
+        const rule = styleRules[style] || styleRules['口播'];
+        if (v % 2 === 0 && !result.startsWith(rule.prefix)) {
+          result = rule.prefix + result;
+          changes.push(`风格开头：添加「${rule.prefix}」`);
+        }
+        if (v % 3 === 0 && !result.endsWith(rule.suffix)) {
+          result = result + rule.suffix;
+          changes.push(`风格结尾：添加「${rule.suffix}」`);
         }
         
         const sensitiveWords = detectSensitiveWords(result);
