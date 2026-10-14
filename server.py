@@ -37,10 +37,9 @@ class RewriteHandler(SimpleHTTPRequestHandler):
                 request_data = json.loads(post_data.decode('utf-8'))
                 original = request_data.get('original', '')
                 version_count = request_data.get('versionCount', 6)
-                style = request_data.get('style', '口播')
                 
                 # 调用 AI 改写
-                rewritten_versions = self.call_ai_rewrite(original, version_count, style)
+                rewritten_versions = self.call_ai_rewrite(original, version_count)
                 
                 # 返回结果
                 response = {
@@ -68,32 +67,20 @@ class RewriteHandler(SimpleHTTPRequestHandler):
             self.send_response(404)
             self.end_headers()
 
-    def call_ai_rewrite(self, original_text, version_count, style='口播'):
+    def call_ai_rewrite(self, original_text, version_count):
         """调用 AI 模型进行改写"""
         versions = []
         
-        style_descriptions = {
-            '口播': '直接有力，适合真人出镜口播，语气坚定有感染力',
-            '故事': '情感共鸣，用故事线叙事，有起承转合',
-            '干货': '信息密集，条理清晰，适合知识分享',
-            '搞笑': '轻松幽默，用段子和梗，适合泛娱乐',
-            '悬念': '制造好奇，先抛问题再解答，适合引流转化'
-        }
-        style_desc = style_descriptions.get(style, style_descriptions['口播'])
-        
         for i in range(version_count):
             prompt = f"""请改写以下抖音短视频脚本，目的是防止被抖音识别为重复内容。
-
-改写风格要求：{style} - {style_desc}
 
 改写要求：
 1. 保留核心信息和结构
 2. 替换同义词、调整句式
 3. 改变开头表达方式
-4. 保持{style}风格的口语化表达
+4. 保持口语化风格
 5. 确保改写后仍然通顺自然
 6. 至少改动5处以上
-7. 符合「{style_desc}」的风格特点
 
 原文：
 {original_text}
